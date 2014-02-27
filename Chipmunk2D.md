@@ -406,27 +406,229 @@ cpFloat cpCircleShapeGetRadius(cpShape *circleShape)
 
 # Chipmunk空间：cpSpace
 
+Chipmunk的空间是模拟的基本单元。你将刚体、形状和约束添加进去然后通过时间来步进模拟。
+
 ## 什么是迭代？为什么我要关心？
 
-## 睡眠
+Chipmunk使用一个迭代求解器来计算出空间刚体之间的力。也就是说它建立了刚体间的所有碰撞、关节和约束的一个列表，并在列表中逐个考虑每一个刚体的若干条件。遍数这些条件便得到迭代次数，且每次迭代会使求解更准确。如果你使用太多的迭代，物理效果看起来应该不错并且坚实稳定，但可能消耗太多的CPU时间。如果你使用过过少的迭代，模拟仿真似乎看起来有些糊状或弹性，而物体应该是坚硬的。设置迭代次数可以让你在CPU使用率和物理精度见做出平衡。 Chipmunk中默认的迭代值是10，足以满足大多数简单的游戏。
+
+## 休眠
+
+休眠是Chipmunk5.3新功能，是指空间停用已停止移动的整个对象群组，以节省CPU时间和电池寿命的能力。为了使用此功能，你必须做两件事情。第一个是，你必须将你的所有静态几何关联到静态刚体。对象不能进入休眠，如果他们接触的是非静态流氓体，即使它的形状是作为静态形状添加的。第二个是，你必须通过`cpSpace.sleepTimeThreshold`设置一个时间阈值来显式启用休眠。如果你没有明确设置`cpSpace.idleSpeedThreshold`，那么Chipmunk会基于当前重力自动产生一个休眠阈值。
 
 ## 属性
 
+```
+int cpSpaceGetIterations(const cpSpace *space)
+void cpSpaceSetIterations(cpSpace *space, int value)
+```
+迭代次数允许你控制求解器计算的精度。默认值为10。更多信息见上面。
+
+```
+cpVect cpSpaceGetGravity(const cpSpace *space)
+void cpSpaceSetGravity(cpSpace *space, cpVect value)
+```
+施加到空间的全局重力。默认是`cpvzero`。可以通过编写自定义积分函数来重写每个刚体。
+
+```
+cpFloat cpSpaceGetDamping(const cpSpace *space)
+void cpSpaceSetDamping(cpSpace *space, cpFloat value)
+```
+施加到空间的简单的阻尼值。数值0.9意味着每个刚体每秒会损失速度会损失掉10%。默认值为1.像重力一样，阻尼值也可以在每个刚体上重写。
+
+```
+cpFloat cpSpaceGetIdleSpeedThreshold(const cpSpace *space)
+void cpSpaceSetIdleSpeedThreshold(cpSpace *space, cpFloat value)
+```
+刚体被考虑为静止限制的速度阈值。默认值为0，意味着让空间来估算猜测基于重力的良好的阈值。
+
+```
+cpFloat cpSpaceGetSleepTimeThreshold(const cpSpace *space)
+void cpSpaceSetSleepTimeThreshold(cpSpace *space, cpFloat value)
+```
+一组刚体休眠需要保持静止闲置的时间阈值。默认值为`INFINITY`, 禁用了休眠功能。
+
+
+```
+cpFloat cpSpaceGetCollisionSlop(const cpSpace *space)
+void cpSpaceSetCollisionSlop(cpSpace *space, cpFloat value)
+```
+支持形状间的重叠量。鼓励将这个值设置高点而不必在意重叠，因为它提高了稳定性。它默认值为0.1。
+
+
+```
+cpFloat cpSpaceGetCollisionBias(const cpSpace *space)
+void cpSpaceSetCollisionBias(cpSpace *space, cpFloat value)
+```
+Chipmunk让快速移动的物体重叠，然后固定重叠。即使横扫碰撞被支持，重叠对象也不可避免，并且这是一个高效，稳定的方式来处理重叠的对象。控制重叠百分比的偏置值在1秒后仍然是不固定的，默认~0.2%。有效值是在0到1的范围内，但由于稳定的原因不推荐使用0。默认值的计算公式为`cpfpow（1.0F - 0.1F，60.0f）`，这意味着Chipmunk试图在1/60s内纠正10%的错误。注：非常非常少的游戏需要更改此值。
+
+```
+cpTimestamp cpSpaceGetCollisionPersistence(const cpSpace *space)
+void cpSpaceSetCollisionPersistence(cpSpace *space, cpTimestamp value)
+```
+
+空间保持碰撞的帧数量。有助于防止抖动接触恶化。默认值为3，非常非常非常少的游戏需要更改此值。
+
+```
+cpFloat cpSpaceGetCurrentTimeStep(const cpSpace *space)
+```
+检索当前(如果你是从cpSpaceStep()回调)或最近(在cpSpaceStep()之外调用)的时间步长。
+
+```
+cpFloat cpSpaceIsLocked(const cpSpace *space)
+```
+在回调中返回true时，意味着你不能从空间添加/删除对象。可以选择创建后步回调来替代。
+
+```
+cpDataPointer cpSpaceGetUserData(const cpSpace *space)
+void cpSpaceSetUserData(cpSpace *space, cpDataPointer value)
+```
+用户定义的数据指针。这点在游戏状态对象或拥有空间的场景管理对象上是很有用的。
+
+```
+cpBody * cpSpaceGetStaticBody(const cpSpace *space)
+```
+
+空间中专用的静态刚体。你不必使用它，而是因为它的内存由空间自动管理，非常方便。如果你想要做回调的话，你可以将它的数据指针指向一些有用的东西。
+
 ## 内存管理函数
 
+```
+cpSpace* cpSpaceAlloc(void)
+cpSpace* cpSpaceInit(cpSpace *space)
+cpSpace* cpSpaceNew()
+
+void cpSpaceDestroy(cpSpace *space)
+void cpSpaceFree(cpSpace *space)
+```
+更多的标准Chipmunk内存函数。
+
+```
+void cpSpaceFreeChildren(cpSpace *space)
+```
+这个函数将释放所有已添加到空间中的的形状、刚体和关节。不要释放`space`空间。你仍然需要自己调用`cpSpaceFree()`。在一个真正的游戏中你可能永远不会使用这个，因为你的游戏状态或者或者游戏控制器应该会管理从空间移除并释放对象。
+
 ## 操作
+```
+cpShape *cpSpaceAddShape(cpSpace *space, cpShape *shape)
+cpShape *cpSpaceAddStaticShape(cpSpace *space, cpShape *shape)
+cpBody *cpSpaceAddBody(cpSpace *space, cpBody *body)
+cpConstraint *cpSpaceAddConstraint(cpSpace *space, cpConstraint *constraint)
+
+void cpSpaceRemoveShape(cpSpace *space, cpShape *shape)
+void cpSpaceRemoveBody(cpSpace *space, cpBody *body)
+void cpSpaceRemoveConstraint(cpSpace *space, cpConstraint *constraint)
+
+cpBool cpSpaceContainsShape(cpSpace *space, cpShape *shape)
+cpBool cpSpaceContainsBody(cpSpace *space, cpBody *body)
+cpBool cpSpaceContainsConstraint(cpSpace *space, cpConstraint *constraint)
+```
+
+这些函数是从空间中添加和删除形状、刚体和约束。添加/删除函数不能在`postStep()`回调之外的一个回调内调用(这和postSolve()回调不同的!)。当`cpSpaceStep()`在仍然执行时，试图从空间添加或删除对象会抛出一个断言。更多信息请参见回调部分。添加函数会返回被添加的对象以便你可以在一行中创建和添加一些东西。注意在移除关联到刚体的形状和约束之前不要去释放刚体，否则会造成崩溃。`contains`函数允许你检查一个对象有没有已经被添加到空间中。
 
 ## 静态动态转换函数
 
+```
+void cpSpaceConvertBodyToStatic(cpSpace *space, cpBody *body)
+```
+将刚体转换为静态刚体。它的质量和力矩将被设置为无穷大，并且速度为0。旧的质量和力矩以及速度都不会被保存。这将有效地将一个刚体和它的形状冻结到一个位置。这不能被一个激活的刚体调用，所以你可能需要先调用`cpSpaceRemoveBody()`。此外，因为它修改了碰撞检测的数据结构，如果你想从另外一个回调函数或迭代器使用你必须使用后一步的回调。
+
+
 ## 空间索引
+
+Chipmunk6正式支持2个空间索引。默认是轴对齐包围盒树，该灵感来自于Bullet物理库中使用的包围盒树，但是我将它与我自己的碰撞对缓存一起做了扩展以便为树实现非常好的时间相干性。树无需调整优化，而且在大多数游戏中会发现使用它会获得更好的性能。另外一个可用的索引是空间哈希，当你有着非常大数量相同尺寸的物体时，它会更快。
+
+有时，你可能需要更新形状的碰撞检测数据。如果你移动静态形状或者刚体，你必须这样做来让Chipmunk知道它需要更新碰撞数据。你可能还希望手动为移动过的普通形状更新碰撞数据，并且仍然想进行查询。
+
+```
+-  void cpSpaceReindexShape(cpSpace *space, cpShape *shape) – 重新索引一个指定的形状
+-  void cpSpaceReindexShapesForBody(cpSpace *space, cpBody *body) - 重新索引指定刚体上的所有形状
+-  void cpSpaceReindexStatic(cpSpace *space) – 重新索引所有静态形状。一般只更新改变的形状会比较快
+```
 
 ## 迭代器
 
+```
+typedef void (*cpSpaceBodyIteratorFunc)(cpBody *body, void *data)
+void cpSpaceEachBody(cpSpace *space, cpSpaceBodyIteratorFunc func, void *data)
+```
+为空间中的每个刚体调用`func`函数，同时传递`data`指针。休眠中的刚体包括在内，但是静态和流氓刚体不包括在内因为他们没有被添加进空间。
+
+
+`cpSpaceEachBody`例子：
+
+```
+// 检测空间中所有刚体是否在休眠的代码片段
+
+// 这个函数被空间中的每个刚体调用
+static void EachBody(cpBody *body, cpBool *allSleeping){
+  if(!cpBodyIsSleeping(body)) *allSleeping = cpFalse;
+}
+
+// 然后在你的更新函数中如下做
+cpBool allSleeping = true;
+cpSpaceEachBody(space, (cpSpaceBodyIteratorFunc)EachBody, &allSleeping);
+printf("All are sleeping: %s\n", allSleeping ? "true" : "false");
+
+```
+
+```
+typedef void (*cpSpaceShapeIteratorFunc)(cpShape *shape, void *data)
+void cpSpaceEachShape(cpSpace *space, cpSpaceShapeIteratorFunc func, void *data)
+```
+为空间中的每个形状调用`func`函数，同时传递`data`指针。休眠和静态形状被包括在内。
+
+```
+typedef void (*cpSpaceConstraintIteratorFunc)(cpConstraint *constraint, void *data)
+void cpSpaceEachConstraint(cpSpace *space, cpSpaceConstraintIteratorFunc func, void *data)
+```
+为空间中的每个约束调用`func`函数同时传递`data`指针。
+
+注意：如果你的编译器支持闭包(如Clang), 那么有另外一组函数你可以调用。`cpSpaceEachBody_b()`等等。更多信息请查看`chipmunk.h`。
+
 ## 空间模拟
 
-## 启用和调优空间哈希
+```
+void cpSpaceStep(cpSpace *space, cpFloat dt)
+```
+通过给定的时间步来更新空间。强烈推荐使用一个固定的时间步长。这样做能大大提高模拟的质量。实现固定的时间步，最简单的方法就是简单的每个帧频步进1/60s（或任何你的目标帧率），而无论花去了多少渲染时间。在许多游戏中这样很有效，但是将物理时间步进和渲染分离是一个更好的方式。[这是一篇介绍如何做的好文章](http://gafferongames.com/game-physics/fix-your-timestep/)。
+
+## 启用和调优空间哈希（散列）
+
+如果你有成千上万个大小大致相同的物体，空间哈希可能会很适合你。
+
+```
+void cpSpaceUseSpatialHash(cpSpace *space, cpFloat dim, int count)
+```
+使空间从碰撞包围盒树切换到空间哈希。 空间哈希数据对大小相当敏感。`dim`是哈希单元的尺寸。设置`dim`为碰撞形状大小的平均尺寸可能会得到最好的性能。设置`dim`太小会导致形状会填充进去很多哈希单元，太低会造成过多的物体插入同一个哈希槽。
+
+`count`是在哈希表中建议的最小的单元数量。如果单元太少，空间哈希会产生很多误报。过多的单元将难以做高速缓存并且浪费内存。将`count`设置成10倍于空间物体的个数可能是一个很好的起点。如果必要的话从那里调优。
+
+关于使用空间哈希有个可视化的演示程序，通过它你可以明白我的意思。灰色正方形达标空间哈希单元。单元颜色越深，就意味着越多的物体被映射到那个单元。一个好的`dim`尺寸也就是你的物体能够很好的融入格子中。
+
+![](http://chipmunk-physics.net/release/ChipmunkLatest-Docs/images/hash_just_right.png)
+
+注意到浅色的灰色意味着每个单元没有太多的物体映射到它。
+
+当你使用太小的尺寸，Chipmunk不得不在每个物体上插入很多哈希单元。这个代价有些昂贵。
+
+![](http://chipmunk-physics.net/release/ChipmunkLatest-Docs/images/hash_too_small.png)
+
+注意到灰色的单元和碰撞形状相比是非常小的。
+
+当你使用过大的尺寸，就会有很多形状填充进每个单元。每个形状不得不和单元中的其他形状进行检查，所以这会造成许多不必要的碰撞检测。
+
+![](http://chipmunk-physics.net/release/ChipmunkLatest-Docs/images/hash_too_big.png)
+
+注意深灰色的单元意味着很多物体映射到了他们。
+
+Chipmunk6也有一个实验性的单轴排序和范围实现。在移动游戏中如果你的世界是很长且扁就像赛车游戏，它是非常高效。如果你想尝试启用它, 可以查阅`cpSpaceUseSpatialHash()`的代码。
 
 ## 札记
+
+-  当从空间中删除对象时，请确保你已经删除了任何引用它的其他对象。例如，当你删除一个刚体时，要先删除掉关联到刚体的关节和形状。
+-  迭代次数和时间步长的大小决定了模拟的质量。越多的迭代次数，或者更小的时间步会提高模拟的质量。请记住，更高质量的同时也意味着更高的CPU使用率。 
+-  因为静态形状只有当你需要的时候才重新哈希，所以可能会使用一个更大的`count`参数来`cpHashResizeStaticHash()`而不是`cpSpaceResizeActiveHash()`。如果你有大量静态形状的话，这样做会使用更多的内存但是会提升性能。
 
 # Chipmunk约束：cpConstraint
 
