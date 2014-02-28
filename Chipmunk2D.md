@@ -1104,6 +1104,19 @@ cpFloat cpSegmentQueryHitDist(cpVect start, cpVect end, cpSegmentQueryInfo info)
 
 ## AABB查询
 
+AABB查询给了你一个快速的方式来大致检测哪些形状在一个范围内。
+
+```
+typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data)
+
+void cpSpaceBBQuery(
+	cpSpace *space, cpBB bb,
+	cpLayers layers, cpGroup group,
+	cpSpaceBBQueryFunc func, void *data
+)
+```
+查询`space`找到`bb`附近并筛选出符合给定图层和组的所有形状。形状的包围盒和`bb`有重叠，则会调用`func`, 并将`data`参数传给`cpSpaceBBQuery()`。传感器类形状也包括在内。
+
 ## 形状查询
 
 形状查询允许你检测空间中的形状是否和一个指定的区域发生了重叠。你可以通过这个来检测物物体是否已经在一个位置存在如果你想在该位置添加另外一个形状的话，又或者在AI中使用它进行感应查询。
