@@ -982,6 +982,8 @@ cpConstraint *cpSimpleMotorNew(cpBody *a, cpBody *b, cpFloat rate);
 
 # Chipmunk碰撞检测概述
 
+Chipmunk为了使得碰撞检测尽可能快，将处理过程分成了若干阶段。虽然我一直试图保持它概念简单，但实现却有点让人生畏。幸运的是作为Chipmunk库的使用者，你并不需要了解一切关于它是如何工作的。但如果你在尝试发挥Chipmunk的极致，理解这一部分会有所帮助。
+
 ## 空间索引
 
 ## 碰撞过滤
