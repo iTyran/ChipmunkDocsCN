@@ -1012,8 +1012,20 @@ Chipmunk为了使得碰撞检测尽可能快，将处理过程分成了若干阶
 
 ## 碰撞处理
 
+碰撞处理函数是Chipmunk能够识别的不同碰撞事件的一组4个回调函数。事件类型是：
 
-## 碰撞处理API
+-  begin():该步中两个形状刚开始第一次接触。回调返回`true`则会处理正常碰撞或返回`false`Chipmunk会完全忽略碰撞。如果返回false，则`preSolve()`和`postSolve()`回调将永远不会被执行，但你仍然会在形状停止重叠的时候接收到一个单独的事件。
+-  preSolve():该步中两个形状相互接触。回调返回`false`Chipmunk在这一步会忽略碰撞或返回`true`来正常处理它。此外，你可以使用`cpArbiterSetFriction()`，`cpArbiterSetElasticity()`或`cpArbiterSetSurfaceVelocity()`来提供自定义的摩擦，弹性，或表面速度值来覆盖碰撞值。更多信息请查看cpArbiter。
+-  postSolve():两种形状相互接触并且它们的碰撞响应已被处理。这时你可以检索碰撞冲力或动能如果你想使用它来计算音量或者伤害值。更多信息请查看cpArbiter。
+-  separate():该步中两个形状刚刚第一次停止接触。确保`begin()`/`separate()`总是被成对调用，当删除接触中的形状时或者析构space时它也会被调用。
+
+碰撞回调都与`cpArbiter`结构紧密相关。你应该熟悉那些为好。 
+
+注：标记为传感器的形状（cpShape.sensor == true）从来不会得到碰撞处理，所以传感器形状和其他形状间永远不会调用`postSolve()`回调。他们仍然会调用`begin()`和`separate()`回调，而`preSolve()`仍然会在每帧被调用回调即使不存在真正的碰撞。
+
+注2：`preSolve()`回调在休眠算法运行之前被调用。如果一个对象进入休眠状态，`postSolve()`回调将不会被调用，直到它被唤醒。
+
+# 碰撞处理API
 
 ## 后步回调
 
