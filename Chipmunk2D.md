@@ -4,12 +4,18 @@
 
 -----------------------------------------------------------------
 
-#Chipmunk2D 6.2.1
+# Chipmunk2D 6.2.1
 Chipmunk2D是一个基于MIT协议的2D刚体物理仿真库。设计宗旨:极快、可移植、稳定、易用。出于这个原因，它已经被用于数百多游戏横跨了几乎所有系统。这些游戏包括了在iPhoneAppStore上的一些顶级出色的如*Night Sky*等许多TOP1游戏。这几年来，我投入了大量的时间来发展Chipmunk，才使得Chipmunk走到今天。如果您发现Chipmunk2D为您节省了许多事件，不妨考虑[捐赠](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552)下。这么做会使一个独立游戏制作者非常开心！
 
 首先，我要非常感谢ErinCatto（译者注：Box2D作者）, 早在2006年的时候，Chipmunk的冲量求解器便是受到他的范例代码的启发而完成。（现在已经发展成一个成熟的物理引擎：Box2D.org) 他的持久接触的想法允许对象的稳定堆栈只进行极少的求解器迭代，而我以前的求解器为了让模拟稳定模拟会产生大量的对象或者会消耗大量的CPU资源。
 
-##Hello Chipmunk（World）
+## 为什么是一个C库
+
+很对人问我为什么用C来写Chipmunk2D而不是一个你喜欢的其他语言。我通常会对不同的编程语言很兴奋，几个月来，挑选的语言有Scheme, OCaml, Ruby, Objective-C, ooc, Lua, Io等等。他们都有一个共同点，那就是很容易的绑定到C代码。同时我也希望Chipmunk2D高效、易移植、优化简单并且容易调试，使用C语言能很简单的达到这些目标。
+
+我从来没有，将来也不太可能去用C来写一个完整的游戏。这里有很多比C有趣的语言，它们有垃圾回收，闭包，面向对象运行时等高级特性。如果你在其它语言中使用Chipmunk2D，可以在[Bindings and Ports](http://chipmunk2d.net/bindingsAndPorts.php)中找到有用的信息。因为Chipmunk2D基于C99的字集编写，使得它很容易集成到C、C++、Object-C等其它开发语言中。
+
+## Hello Chipmunk（World）
 Hello world Chipmunk 风格。创建一个模拟，模拟一个球掉落到一个静态线段上然后滚动出去，并打印球的坐标。
 
 
