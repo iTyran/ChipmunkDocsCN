@@ -1116,7 +1116,7 @@ cpFloat cpSegmentQueryHitDist(cpVect start, cpVect end, cpSegmentQueryInfo info)
 
 ## AABB查询
 
-AABB查询给了你一个快速的方式来大致检测哪些形状在一个范围内。
+AABB查询提供一个快速的方式来粗略检测一个范围内存在的形状。
 
 ```
 typedef void (*cpSpaceBBQueryFunc)(cpShape *shape, void *data)
@@ -1127,7 +1127,8 @@ void cpSpaceBBQuery(
 	cpSpaceBBQueryFunc func, void *data
 )
 ```
-查询`space`找到`bb`附近并筛选出符合给定图层和组的所有形状。形状的包围盒和`bb`有重叠，则会调用`func`, 并将`data`参数传给`cpSpaceBBQuery()`。传感器类形状也包括在内。
+
+查询`space`找到`bb`附近并筛选出符合给定层和组的所有形状。每个包围盒和`bb`有重叠的形状，都会调用`func`, 并将`data`参数传给`cpSpaceBBQuery()`。传感器类形状也包括在内。
 
 ## 形状查询
 
