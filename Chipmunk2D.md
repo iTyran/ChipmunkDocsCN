@@ -15,6 +15,12 @@ Chipmunk2D是一个基于MIT协议的2D刚体物理仿真库。设计宗旨:极�
 
 我从来没有，将来也不太可能去用C来写一个完整的游戏。这里有很多比C有趣的语言，它们有垃圾回收，闭包，面向对象运行时等高级特性。如果你在其它语言中使用Chipmunk2D，可以在[Bindings and Ports](http://chipmunk2d.net/bindingsAndPorts.php)中找到有用的信息。因为Chipmunk2D基于C99的字集编写，使得它很容易集成到C、C++、Object-C等其它开发语言中。
 
+## C API的局限
+
+Chipmunk确实提供了操作符*，+和 - （一元和二元）的重载，如果您使用的是C++，如果使用的是C那么需要退回使用cpvadd() 和 cpvsub()。这有一点点不利于代码阅读，当你习惯之后这将不是个问题。大部分的向量操作可能并没任何形式的符号对应（至少不在键盘上）。
+
+C API的另一个问题是访问限制。Chipmunk有许多结构体，字段，函数只能内部使用。要解决这个问题，我把Chipmunk的全部私有API分离到头文件chipmunk_private.h中，同时在共有结构中使用CP_PRIVATE()来改名。你可以通过包含这个头文件或使用这个宏来自由访问私有API，但请注意这些私有API可能在未来版本中改变或消失，并且不会在文档中体现，同时也没有私有API的文档计划。
+
 ## Hello Chipmunk（World）
 Hello world Chipmunk 风格。创建一个模拟，模拟一个球掉落到一个静态线段上然后滚动出去，并打印球的坐标。
 
