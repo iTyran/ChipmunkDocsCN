@@ -126,6 +126,13 @@ SOFTWARE.
 ```
 意味着对于商业项目你不必购买许可或者购买使用Chipmunk。（虽然我们真的很感谢捐赠）
 
+## 链接
+
+-  [Chipmunk论坛](http://chipmunk2d.net/forum) - Chipmunk2D官方论坛
+-  [Howling Moon Software](http://howlingmoonsoftware.com/) - 我合办的软件公司（我们提供外包工作）
+-  [Chipmunk2D Pro](http://chipmunk2d.net/chipmunkPro.php) - Chipmunk的增强版本，我们为ARM或者多核平台做了一些特定的优化，如从图像或程序数据中进行自动几何操作，以及为Objective-C做了API封装。
+-  [游戏](http://chipmunk2d.net/games.php) - 使用Chimunk做的游戏清单。至少一小部分我们知道。
+
 # Chipmunk2D 基础
 ## 概述
 
