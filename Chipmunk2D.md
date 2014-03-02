@@ -1067,7 +1067,13 @@ void cpSpaceSetDefaultCollisionHandler(
 
 ## 后步回调
 
+后步回调允许你打破在一个回调内增加或删除对象的规则。事实上，他们的主要功能就是帮助你安全的从你想要禁用/破坏一个碰撞/查询回调的空间中移除对象。
+
+后步回调被注册为一个函数和用作键的一个指针。你只能为每个键注册一个`postStep()`回调。这可以防止你不小心多次删除对象。例如，假设你有子弹和对象A之间的碰撞回调。你想摧毁子弹和对象A，因此你注册一个`postStep()`回调来从游戏中安全地移除它们。然后，你得到子弹和对象B之间的碰撞回调，你注册一个`postStep()`回调来删除对象B，第二次`postStep()`回调来移除子弹。因为你只能为每个键注册一次回调， `postStep()`回调对于子弹而言只会被调用一次，你不可能意外删除两次。
+
 ## 例子
+
+更多信息请查看[]碰撞回调范例](http://chipmunk-physics.net/release/ChipmunkLatest-Docs/examples.html#CollisionCallbacks)。
 
 # Chipmunk碰撞对：cpArbiter
 
