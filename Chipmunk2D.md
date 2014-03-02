@@ -84,8 +84,47 @@ int main(void){
   
   // Clean up our objects and exit!
   cpShapeFree(ballShape);
-  cpBodyFree(ballBody);
+  cpBodyFree(ballBody);  
+  cpShapeFree(ground);
+  cpSpaceFree(space);
+  
+  return 0;  
 ```
+
+## 支持
+
+获得支持最好的方式就是访问[Chipmunk论坛](http://www.slembcke.net/forums/viewforum.php?f=1)。上面有许多人使用Chipmunk，应用在我知道的各个平台上。如果你在做一个商业项目，Howling Moon Software（我的公司）可[给与支持](http://howlingmoonsoftware.com/contracting.php)。我们可以帮助你实现自定义Chipmunk行为，以及bug修复和性能优化。
+
+## 联系
+
+如果你发现Chipmunk中的任何bug，错误或者该文档中坏掉的链接，又或者对于Chipmunk有任何疑问、评论，都可以通过 slembcke@gmail.com (email或者GTalk)联系我。
+
+## 开源协议
+
+Chipmunk基于MIT协议。
+
+```
+Copyright (c) 2007-2013 Scott Lembcke and Howling Moon Software
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+意味着对于商业项目你不必购买许可或者购买使用Chipmunk。（虽然我们真的很感谢捐赠）
 
 # Chipmunk2D 基础
 ## 概述
@@ -1079,7 +1118,7 @@ void cpSpaceSetDefaultCollisionHandler(
 
 Chipmunk的`cpArbiter`结构封装了一对碰撞的形状和关于他们的所有碰撞数据。
 
-为什么称之为仲裁者？简短来说，我一直用的是“仲裁”来形容碰撞解决的方式，然后早在2006年当我在看Box2D的求解器的时候看到了Box2D居然叫他们仲裁者。仲裁者就像是一个法官，有权力来解决两个人之间的纠纷。这是有趣的，使用了合适的名字并且输入比我以前用的`CollisionPair`要短。它最初只是被设定为一个私有的内部结构，但却在回调中变得有用。
+为什么称之为仲裁者？简短来说，我一直用的是“仲裁”来形容碰撞解决的方式，然后早在2006年当我在看Box2D的求解器的时候看到了Box2D居然叫他们仲裁者。仲裁者就像是一个法官，有权力来解决两个人之间的纠纷。这是有趣的，使用了合适的名字并且输入比我以前用的`CollisionPair`要短。它最初只是被设定为一个私有的内部结构，但却在回调中很有用。
 
 ## 内存管理
 
