@@ -1027,6 +1027,44 @@ Chipmunk为了使得碰撞检测尽可能快，将处理过程分成了若干阶
 
 # 碰撞处理API
 
+```
+typedef int (*cpCollisionBeginFunc)(cpArbiter *arb, struct cpSpace *space, void *data)
+typedef int (*cpCollisionPreSolveFunc)(cpArbiter *arb, cpSpace *space, void *data)
+typedef void (*cpCollisionPostSolveFunc)(cpArbiter *arb, cpSpace *space, void *data)
+typedef void (*cpCollisionSeparateFunc)(cpArbiter *arb, cpSpace *space, void *data)
+```
+碰撞处理函数类型。所有这些函数都附带一个arbiter，space和用户data指针，只有`begin()`和`preSolve()`回调会返回值。更多信息请查看上方碰撞处理。
+
+```
+void cpSpaceAddCollisionHandler(
+	cpSpace *space,
+	cpCollisionType a, cpCollisionType b,
+	cpCollisionBeginFunc begin,
+	cpCollisionPreSolveFunc preSolve,
+	cpCollisionPostSolveFunc postSolve,
+	cpCollisionSeparateFunc separate,
+	void *data
+)
+```
+为指定的碰撞类型对添加一个碰撞处理函数。每当碰撞类型（cpShape.collision_type）为a的形状与碰撞类型为b的形状碰撞时，这些回调就会被调用来处理碰撞。`data`是用户定义的上下文指针，用来传递到每个回调中。你不想实现的话可以使用`NULL`，然而Chipmunk会调用它自身的默认版本而不是你为space设置的默认值。如果你需要依赖space的默认回调，你必须单独为每个处理函数定义提供实现。
+
+```
+void cpSpaceRemoveCollisionHandler(cpSpace *space, cpCollisionType a, cpCollisionType b)
+```
+移除指定碰撞类型对的碰撞处理函数。
+
+```
+void cpSpaceSetDefaultCollisionHandler(
+	cpSpace *space,
+	cpCollisionBeginFunc begin,
+	cpCollisionPreSolveFunc preSolve,
+	cpCollisionPostSolveFunc postSolve,
+	cpCollisionSeparateFunc separate,
+	void *data
+)
+```
+当没有具体的碰撞处理时Chipmunk会使用一个默认的注册碰撞处理函数。space在创建时被指定了一个默认的处理函数，该函数在`begin()`和`preSolve()`回调中返回`true`，在`postSolve()`和`separate()`回调中不做任何事情。
+
 ## 后步回调
 
 ## 例子
