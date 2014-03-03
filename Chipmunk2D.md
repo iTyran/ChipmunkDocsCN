@@ -21,6 +21,12 @@ Chipmunk确实提供了操作符*，+和 - （一元和二元）的重载，如�
 
 C API的另一个问题是访问限制。Chipmunk有许多结构体，字段，函数只能内部使用。要解决这个问题，我把Chipmunk的全部私有API分离到头文件chipmunk_private.h中，同时在共有结构中使用CP_PRIVATE()来改名。你可以通过包含这个头文件或使用这个宏来自由访问私有API，但请注意这些私有API可能在未来版本中改变或消失，并且不会在文档中体现，同时也没有私有API的文档计划。
 
+## Chipmunk2D Pro
+
+我们同时在出售Chipmunk2D的扩展版本： Chipmunk2D Pro。主要的特性有：ARM和NEON指令优化，多线程优化，一个为iOS/Mac开发提供的Objective-C封装层，以及自动几何工具。优化主要集中在提高移动性能，同时多线程特性能在支持pthread的平台运行。Objective-C封装层能让你无缝整合到Cocos2D或UIKit等框架，并能获得本地内存管理的优势（包括ARC）。同时Pro版本有大量优秀的API扩展。自动几何工具能让你从图像数据或程序生成并使用几何。
+
+另外，出售Chipmunk2D Pro让我们得以生存，并保持Chipmunk2D的开源。捐献也能棒，但是购买Pro版本你将获得捐献之外的某些东西。
+
 ## Hello Chipmunk（World）
 Hello world Chipmunk 风格。创建一个模拟，模拟一个球掉落到一个静态线段上然后滚动出去，并打印球的坐标。
 
