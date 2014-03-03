@@ -218,6 +218,33 @@ static const cpVect cpvzero = {0.0f,0.0f};
 cpVect cpv(const cpFloat x, const cpFloat y)
 ```
 
+- cpBool cpveql(const cpVect v1, const cpVect v2) – 检测两个向量是否相等。在使用C++程序时，Chipmunk提供一个重载操作符==。（比较浮点数时要仔细！）
+- cpVect cpvadd(const cpVect v1, const cpVect v2) – 两个向量相加。在使用C++程序时，Chipmunk提供一个重载操作符+。
+- cpVect cpvsub(const cpVect v1, const cpVect v2) – 两个向量相减。在使用C++程序时，Chipmunk提供一个重载操作符-。
+- cpVect cpvneg(const cpVect v) – 使一个向量反向。在使用C++程序时，Chipmunk提供一个重载一个一元负操作符-。
+- cpVect cpvmult(const cpVect v, const cpFloat s) – 标量乘法。在使用C++程序时，Chipmunk提供一个重载操作符*。
+- cpFloat cpvdot(const cpVect v1, const cpVect v2) – 向量的点积。
+- cpFloat cpvcross(const cpVect v1, const cpVect v2) – 2D向量交叉相乘的模。2D向量交叉相乘的积作为一个只有z坐标的3D向量的z值。函数返回z坐标的值。
+- cpVect cpvperp(const cpVect v) – 返回一个垂直向量。（旋转90度）
+- cpVect cpvrperp(const cpVect v) – 返回一个垂直向量。（旋转-90度）
+- cpVect cpvproject(const cpVect v1, const cpVect v2) – 返回向量v1在向量v2上的投影。
+- cpVect cpvrotate(const cpVect v1, const cpVect v2) – 使用复杂的乘法运算将向量v1按照向量v2旋转。如果v1不是单位向量，则v1会被缩放。
+- cpVect cpvunrotate(const cpVect v1, const cpVect v2) – 和cpvrotate()相反。
+- cpFloat cpvlength(const cpVect v) – 返回v的长度。
+- cpFloat cpvlengthsq(const cpVect v) – 返回v的长度的平方，如果只是比较长度的话它的速度比cpvlength()快。
+- cpVect cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t) – 在v1和v2之间线性插值。
+- cpVect cpvlerpconst(cpVect v1, cpVect v2, cpFloat d) – 以长度d在v1和v2之间线性插值。
+- cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t) – 在v1和v2之间球形线性插值。
+- cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a) – 在v1和v2之间以不超过角a的弧度值球形线性插值。
+- cpVect cpvnormalize(const cpVect v) – 返回a的一个正常化副本。作为特殊例子，在调用cpvzero时返回cpvzero。
+- cpVect cpvclamp(const cpVect v, const cpFloat len) – 将v固定到len上。
+- cpFloat cpvdist(const cpVect v1, const cpVect v2) – 返回v1和v2间的距离。
+- cpFloat cpvdistsq(const cpVect v1, const cpVect v2) – 返回v1和v2间的距离的平方。如果只是比较距离的话它比cpvdist()快。
+- cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist) – 如果v1和v2间的距离小于dist则返回真。
+- cpVect cpvforangle(const cpFloat a) – 返回所给角（以弧度）单位向量。
+- cpFloat cpvtoangle(const cpVect v) – 返回v所指的角度方向的弧度。
+
+
 # Chipmunk轴对齐边界盒：cpBB
 
 ## 结构体定义和构造函数
