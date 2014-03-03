@@ -27,9 +27,40 @@ C API的另一个问题是访问限制。Chipmunk有许多结构体，字段，�
 
 另外，出售Chipmunk2D Pro让我们得以生存，并保持Chipmunk2D的开源。捐献也能棒，但是购买Pro版本你将获得捐献之外的某些东西。
 
-## Hello Chipmunk（World）
-Hello world Chipmunk 风格。创建一个模拟，模拟一个球掉落到一个静态线段上然后滚动出去，并打印球的坐标。
+## 下载与编译
 
+如果你还没有下载，你总可以在[这里](http://chipmunk-physics.net/release/ChipmunkLatest.tgz)获取到Chipmunk2D的最新版本。里面包含了[CMake](http://www.cmake.org/)的命令行编译脚本, Xcode工程以及Visual Studio ’09 和 ’10工程。
+
+### Debug 或 Release？
+
+Debug模式可能略慢，但是包含了大量的错误检测断言，可以帮助你快速定位类似重复移除对象或无法检测的碰撞这样的BUG。我高度建议你使用Debug模式直到你的游戏即将Release发售。
+
+### XCode (Mac/iPhone)
+
+源码中的Xcode工程可直接build出一个Mac或iOS静态库。另外，你可以运行**macosx/iphonestatic.command**或**macosx/macstatic.command**来生成一个带头文件和debug/release静态库的目录，以便你可以方便的集成到你的项目中。直接在你的项目中引入Chipmunk源码以及正确的编译选项并非易事。iPhone编译脚本能生成一个可用在iOS模拟器和设备的通用库（“fat” library），其中的模拟器版本用的debug模式编译，而设备版本用的release模式编译。
+
+### MSVC
+
+我很少使用MSVC，其他开发者帮忙维护了Visual Studio工程文件。MSVC 10工程应该能正常工作，因为我经常在发布稳定版本前测试它。MSVC 9工程可能运行不正常，我很少也没有必要取运行这个工程，如何你遇到问题，通知我。
+
+### 命令行
+
+CMake编译脚本能在任何你安装了CMake的系统上运行。它甚至能生成XCode或MSVC工程（查看CMake文档获取更多信息）。
+
+下面的命令编译一个Debug的Chipmunk：
+
+```
+cmake -D CMAKE_BUILD_TYPE=Debug .
+make
+```
+
+如何没有`-D CMAKE_BUILD_TYPE=Debug`参数，将生成一个release版本。
+
+为什么使用CMake？一个非常好心的人完成了这个脚本的最初版本，然后我发现CMake能非常方便的解决跨平台编译问题。我知道有些人非常讨厌安装一些胡乱的非make编译系统以便能编译某些东西，但是CMake确实节省了我大量的时间和功夫。
+
+## Hello Chipmunk（World）
+
+Hello world Chipmunk 风格。创建一个模拟，模拟一个球掉落到一个静态线段上然后滚动出去，并打印球的坐标。
 
 ```
 #include <stdio.h>
