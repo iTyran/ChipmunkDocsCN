@@ -21,9 +21,46 @@ Chipmunk确实提供了操作符*，+和 - （一元和二元）的重载，如�
 
 C API的另一个问题是访问限制。Chipmunk有许多结构体，字段，函数只能内部使用。要解决这个问题，我把Chipmunk的全部私有API分离到头文件chipmunk_private.h中，同时在共有结构中使用CP_PRIVATE()来改名。你可以通过包含这个头文件或使用这个宏来自由访问私有API，但请注意这些私有API可能在未来版本中改变或消失，并且不会在文档中体现，同时也没有私有API的文档计划。
 
-## Hello Chipmunk（World）
-Hello world Chipmunk 风格。创建一个模拟，模拟一个球掉落到一个静态线段上然后滚动出去，并打印球的坐标。
+## Chipmunk2D Pro
 
+我们同时在出售Chipmunk2D的扩展版本： Chipmunk2D Pro。主要的特性有：ARM和NEON指令优化，多线程优化，一个为iOS/Mac开发提供的Objective-C封装层，以及自动几何工具。优化主要集中在提高移动性能，同时多线程特性能在支持pthread的平台运行。Objective-C封装层能让你无缝整合到Cocos2D或UIKit等框架，并能获得本地内存管理的优势（包括ARC）。同时Pro版本有大量优秀的API扩展。自动几何工具能让你从图像数据或程序生成并使用几何。
+
+另外，出售Chipmunk2D Pro让我们得以生存，并保持Chipmunk2D的开源。捐献也能棒，但是购买Pro版本你将获得捐献之外的某些东西。
+
+## 下载与编译
+
+如果你还没有下载，你总可以在[这里](http://chipmunk-physics.net/release/ChipmunkLatest.tgz)获取到Chipmunk2D的最新版本。里面包含了[CMake](http://www.cmake.org/)的命令行编译脚本, Xcode工程以及Visual Studio ’09 和 ’10工程。
+
+### Debug 或 Release？
+
+Debug模式可能略慢，但是包含了大量的错误检测断言，可以帮助你快速定位类似重复移除对象或无法检测的碰撞这样的BUG。我高度建议你使用Debug模式直到你的游戏即将Release发售。
+
+### XCode (Mac/iPhone)
+
+源码中的Xcode工程可直接build出一个Mac或iOS静态库。另外，你可以运行**macosx/iphonestatic.command**或**macosx/macstatic.command**来生成一个带头文件和debug/release静态库的目录，以便你可以方便的集成到你的项目中。直接在你的项目中引入Chipmunk源码以及正确的编译选项并非易事。iPhone编译脚本能生成一个可用在iOS模拟器和设备的通用库（“fat” library），其中的模拟器版本用的debug模式编译，而设备版本用的release模式编译。
+
+### MSVC
+
+我很少使用MSVC，其他开发者帮忙维护了Visual Studio工程文件。MSVC 10工程应该能正常工作，因为我经常在发布稳定版本前测试它。MSVC 9工程可能运行不正常，我很少也没有必要取运行这个工程，如何你遇到问题，通知我。
+
+### 命令行
+
+CMake编译脚本能在任何你安装了CMake的系统上运行。它甚至能生成XCode或MSVC工程（查看CMake文档获取更多信息）。
+
+下面的命令编译一个Debug的Chipmunk：
+
+```
+cmake -D CMAKE_BUILD_TYPE=Debug .
+make
+```
+
+如何没有`-D CMAKE_BUILD_TYPE=Debug`参数，将生成一个release版本。
+
+为什么使用CMake？一个非常好心的人完成了这个脚本的最初版本，然后我发现CMake能非常方便的解决跨平台编译问题。我知道有些人非常讨厌安装一些胡乱的非make编译系统以便能编译某些东西，但是CMake确实节省了我大量的时间和功夫。
+
+## Hello Chipmunk（World）
+
+Hello world Chipmunk 风格。创建一个模拟，模拟一个球掉落到一个静态线段上然后滚动出去，并打印球的坐标。
 
 ```
 #include <stdio.h>
@@ -211,6 +248,33 @@ static const cpVect cpvzero = {0.0f,0.0f};
 ```
 cpVect cpv(const cpFloat x, const cpFloat y)
 ```
+
+- cpBool cpveql(const cpVect v1, const cpVect v2) – 检测两个向量是否相等。在使用C++程序时，Chipmunk提供一个重载操作符==。（比较浮点数时要仔细！）
+- cpVect cpvadd(const cpVect v1, const cpVect v2) – 两个向量相加。在使用C++程序时，Chipmunk提供一个重载操作符+。
+- cpVect cpvsub(const cpVect v1, const cpVect v2) – 两个向量相减。在使用C++程序时，Chipmunk提供一个重载操作符-。
+- cpVect cpvneg(const cpVect v) – 使一个向量反向。在使用C++程序时，Chipmunk提供一个重载一个一元负操作符-。
+- cpVect cpvmult(const cpVect v, const cpFloat s) – 标量乘法。在使用C++程序时，Chipmunk提供一个重载操作符*。
+- cpFloat cpvdot(const cpVect v1, const cpVect v2) – 向量的点积。
+- cpFloat cpvcross(const cpVect v1, const cpVect v2) – 2D向量交叉相乘的模。2D向量交叉相乘的积作为一个只有z坐标的3D向量的z值。函数返回z坐标的值。
+- cpVect cpvperp(const cpVect v) – 返回一个垂直向量。（旋转90度）
+- cpVect cpvrperp(const cpVect v) – 返回一个垂直向量。（旋转-90度）
+- cpVect cpvproject(const cpVect v1, const cpVect v2) – 返回向量v1在向量v2上的投影。
+- cpVect cpvrotate(const cpVect v1, const cpVect v2) – 使用复杂的乘法运算将向量v1按照向量v2旋转。如果v1不是单位向量，则v1会被缩放。
+- cpVect cpvunrotate(const cpVect v1, const cpVect v2) – 和cpvrotate()相反。
+- cpFloat cpvlength(const cpVect v) – 返回v的长度。
+- cpFloat cpvlengthsq(const cpVect v) – 返回v的长度的平方，如果只是比较长度的话它的速度比cpvlength()快。
+- cpVect cpvlerp(const cpVect v1, const cpVect v2, const cpFloat t) – 在v1和v2之间线性插值。
+- cpVect cpvlerpconst(cpVect v1, cpVect v2, cpFloat d) – 以长度d在v1和v2之间线性插值。
+- cpVect cpvslerp(const cpVect v1, const cpVect v2, const cpFloat t) – 在v1和v2之间球形线性插值。
+- cpVect cpvslerpconst(const cpVect v1, const cpVect v2, const cpFloat a) – 在v1和v2之间以不超过角a的弧度值球形线性插值。
+- cpVect cpvnormalize(const cpVect v) – 返回a的一个正常化副本。作为特殊例子，在调用cpvzero时返回cpvzero。
+- cpVect cpvclamp(const cpVect v, const cpFloat len) – 将v固定到len上。
+- cpFloat cpvdist(const cpVect v1, const cpVect v2) – 返回v1和v2间的距离。
+- cpFloat cpvdistsq(const cpVect v1, const cpVect v2) – 返回v1和v2间的距离的平方。如果只是比较距离的话它比cpvdist()快。
+- cpBool cpvnear(const cpVect v1, const cpVect v2, const cpFloat dist) – 如果v1和v2间的距离小于dist则返回真。
+- cpVect cpvforangle(const cpFloat a) – 返回所给角（以弧度）单位向量。
+- cpFloat cpvtoangle(const cpVect v) – 返回v所指的角度方向的弧度。
+
 
 # Chipmunk轴对齐边界盒：cpBB
 
