@@ -256,7 +256,9 @@ cpBB cpBBNewForCircle(const cpVect p, const cpFloat r)
 
 ## 流氓和静态刚体
 
-一般当我们创建一个刚体并将它添加到空间上后，空间就开始对之进行模拟，包括了对刚体位置、速度、受力以及重力影响等的模拟。没被添加到空间（没有被模拟）的刚体我们把它称之为*流氓刚体*。流氓刚体最重要的用途就是用来当作静态刚体，但是你仍然可以使用它来实现如移动平台这样的直接受控物体。
+一般当我们创建一个刚体并将它添加到空间上后，空间就开始对之进行模拟，包括了对刚体位置、速度、受力以及重力影响等的模拟。没被添加到空间（没有被模拟）的刚体我们把它称之为*流氓刚体*。流氓刚体最重要的用途就是用来当作静态刚体，但是你仍然可以使用它们来实现如移动平台这样的直接受控物体。
+
+静态刚体是流氓刚体
 
 
 ## 内存管理函数
@@ -270,26 +272,263 @@ void cpBodyDestroy(cpBody *body)
 void cpBodyFree(cpBody *body)
 ```
 
-如上是一套标准的Chipmunk内存管理函数。`m`和`i`是刚体的质量和转动惯性。猜想刚体的质量通常是好的，但是猜想刚体的转动惯性却会导致一个很差的模拟。在刚体未被从空间中移除之前，要小心不要释放刚体所关联的任何形状或者约束。
+如上是一套标准的Chipmunk内存管理函数。`m`和`i`是刚体的质量和转动惯性。猜想刚体的质量通常是好的，但是猜想刚体的转动惯性却会导致一个很差的模拟。在任何关联到刚体的形状或者约束从空间移除之前注意不要释放刚体。
 
 
 ## 创建额外静态刚体
 
+每一个`cpSpace`都有一个可以直接使用的内建的静态刚体，制作你自己的也非常便利。一个潜在的用途就是用在关卡编辑器中。通过将关卡的块关联到静态刚体，你仍然可以相互独立的移动和旋转块。然后你要做的就是在结束后调用`cpSpaceRehashStatic()`来重建静态碰撞检测的数据。
+
+关于流氓和静态刚体的更多信息，请看Chipmunk空间。
+
+```
+cpBody *cpBodyAlloc(void);
+cpBody *cpBodyInitStatic(cpBody *body)
+cpBody *cpBodyNewStatic()
+```
+创建额外的具有无限的质量和转动惯量的静态物体。
+
 ## 属性
+
+Chipmunk为刚体的多个属性提供了getter/setter函数。如果刚体在休眠状态，设置大多数属性会自动唤醒它们。如果你想，你也可以直接在`cpBody`结构体内设置字段。它们都在头文件中有记录。
+
+```
+cpFloat cpBodyGetMass(const cpBody *body)
+void cpBodySetMass(cpBody *body, cpFloat m)
+```
+刚体的质量。
+
+```
+cpFloat cpBodyGetMoment(const cpBody *body)
+void cpBodySetMoment(cpBody *body, cpFloat i)
+```
+
+刚体的转动惯量（？？）。惯性就像刚体的旋转质量。请请参阅下面的函数来帮助计算惯量。
+
+```
+cpVect cpBodyGetPos(const cpBody *body)
+void cpBodySetPos(cpBody *body, cpVect pos)
+```
+刚体重心的位置。当改变位置的时候如果你要计划对空间进行任何查询，你可能还需要调用`cpSpaceReindexShapesForBody()`来更新关联形状的碰撞检测信息。
+
+```
+cpVect cpBodyGetVel(const cpBody *body)
+void cpBodySetVel(cpBody *body, const cpVect value)
+```
+刚体重心的线速度。
+
+```
+cpVect cpBodyGetForce(const cpBody *body)
+void cpBodySetForce(cpBody *body, const cpVect value)
+```
+施加到刚体重心的力。
+
+```
+cpFloat cpBodyGetAngle(const cpBody *body)
+void cpBodySetAngle(cpBody *body, cpFloat a)
+```
+刚体的角度，弧度制。当改变角度的时候如果你要计划对空间进行任何查询，你可能还需要调用`cpSpaceReindexShapesForBody()`来更新关联形状的碰撞检测信息。
+
+```
+cpFloat cpBodyGetAngVel(const cpBody *body)
+void cpBodySetAngVel(cpBody *body, const cpFloat value)
+```
+刚体的角速度，弧度/秒，
+
+```
+cpFloat cpBodyGetTorque(const cpBody *body)
+void cpBodySetTorque(cpBody *body, const cpFloat value)
+
+```
+施加到刚体的扭矩。
+
+```
+cpVect cpBodyGetRot(const cpBody *body)
+```
+刚体的旋转向量。可通过`cpvrotate()`或者`cpvunrotate()`进行快速旋转。
+
+```
+cpFloat cpBodyGetVelLimit(const cpBody *body)
+void cpBodySetVelLimit(cpBody *body, const cpFloat value)
+```
+刚体的速度极限。、默认为`INFINITY`（无限大），除非你专门设置它。可以被用来限制下落速度等。
+
+```
+cpFloat cpBodyGetAngVelLimit(const cpBody *body)
+void cpBodySetAngVelLimit(cpBody *body, const cpFloat value)
+```
+刚体以弧度/秒的角速度限制。默认为`INFINITY`，除非你专门设置它。
+
+```
+cpSpace* cpBodyGetSpace(const cpBody *body)
+```
+获取`body`被添加进去的`cpSpace`。
+
+```
+cpDataPointer cpBodyGetUserData(const cpBody *body)
+void cpBodySetUserData(cpBody *body, const cpDataPointer value)
+```
+使用数据指针。使用该指针从回调中获取拥有该刚体的游戏对象。
+
 
 ## 转动惯性和一些帮助函数
 
+使用以下函数来近似计算出刚体的转动惯量，如果想得到多个，将结果相加在一起。
+
+-  cpFloat cpMomentForCircle(cpFloat m, cpFloat r1, cpFloat r2, cpVect offset) – 计算空心圆的转动惯性，r1和r2是在任何特定顺序下的内径和外径。 （实心圆圈的内径为0）
+-  cpFloat cpMomentForSegment(cpFloat m, cpVect a, cpVect b) – 计算线段的转动惯量。端点`a`和`b`相对于刚体。
+-  cpFloat cpMomentForPoly(cpFloat m, int numVerts, const cpVect *verts, cpVect offset) – 计算固定多边形的转动惯量，假设它的中心在质心上。`offset`偏移值被加到每个顶点。
+-  cpFloat cpMomentForBox(cpFloat m, cpFloat width, cpFloat height) – 计算居中于刚体的实心矩形的转动惯量。
+
+转动惯量例子
+
+```
+// 质量为2，半径为5的实心圆的转动惯量
+cpFloat circle1 = cpMomentForCircle(2, 0, 5, cpvzero);
+
+// 质量为1，内径为1，外径为6的空心圆的转动惯量
+cpFloat circle2 = cpMomentForCircle(1, 2, 6, cpvzero);
+
+// 质量为1，半径为3，x轴方向偏离重心量为3的实心圆的转动惯量
+cpFloat circle3 = cpMomentForCircle(2, 0, 5, cpv(3, 0));
+
+// 复合对象。居中于重心的1x4的矩形和y轴偏移重心量为3，半径为1的实心圆
+// 只需将转动惯量相加到一起
+cpFloat composite = cpMomentForBox(boxMass, 1, 4) + cpMomentForCircle(circleMass, 0, 1, cpv(0, 3));
+```
+
+如果你想近似计算质量或密度诸如此类的东西可以使用下列函数来获取Chipmunk形状区域。
+
+-  cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2) – 空心圆形状区域
+-  cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r) – Area of a beveled segment. (Will always be zero if radius is zero)
+-  cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts) – Signed area of a polygon shape. Returns a negative number for polygons with a backwards winding.
+
+
 ## 坐标系转换函数
+
+许多事情被定义在刚体的局部坐标，也就意味味着（0,0）是刚体的重心和轴线旋转中心。
+
+-  cpVect cpBodyLocal2World(const cpBody *body, const cpVect v) – 从刚体局部坐标系转换到世界坐标系
+-  cpVect cpBodyWorld2Local(const cpBody *body, const cpVect v) – 从世界坐标系转换到刚体的局部坐标系
 
 ## 施加力和力矩
 
-## 睡眠函数
+人们有时候容易混淆力和冲力之间的区别。冲力基本上是一个在非常短的时间内施加的一个非常大的力，就像一个球集中一堵墙或者大炮射击一样。Chipmunk将冲力看作是发生在一瞬间直接施加在物体的速度上。无论是力还是冲力都收到物体质量的影响。物体质量翻倍，则效果减半。
+
+-  void cpBodyResetForces(cpBody *body) – 对刚体施加0值的力和扭矩
+-  void cpBodyApplyForce(cpBody *body, const cpVect f, const cpVect r) – 在离重心相对偏移量为r的位置施加`f`的力于`body`上
+-  void cpBodyApplyImpulse(cpBody *body, const cpVect j, const cpVect r) – 在离重心相对偏移量为r的位置施加`j`的冲力于`body`上。
+
+注: `cpBodyApplyForce()`和`cpBodyApplyImpulse()`两者都是在绝对坐标系中施加力或者冲力，并在绝对坐标系中产生相对的偏移。（偏移量相对于重心位置，但不随刚体旋转）
+
+
+## 休眠函数
+
+Chipmunk支持休眠功能，以便其停止使用CPU时间来模拟停止移动的对象组。更多信息请查阅cpSpace部分。
+
+-  cpBool cpBodyIsSleeping(const cpBody *body) – 如果刚体在休眠则返回`true`。
+-  void cpBodyActivate(cpBody *body) – 重设刚体的闲置时间。如果在休眠，则会唤醒它以及和它接触的任何其他刚体。
+-  void cpBodySleep(cpBody *body) – 强制一个刚体立即进入休眠，即使它在半空中。不能从回调中被调用。
+-  void cpBodyActivateStatic(cpBody *body, cpShape *filter) – 和`cpBodyActivate()`功能类似。激活刚体接触的所有刚体。如果`filter`不为`NULL`，那么只有通过筛选过滤的刚体才会被唤醒。
+
+```
+void cpBodySleepWithGroup(cpBody *body, cpBody *group)
+```
+当对象在Chipmunk中进入休眠，接触或连接在一起所有刚体作为一组进入休眠。当对象被唤醒时，和它一组的所有对象都会被唤醒。
+
+
+当一个对象被唤醒时，所有在它的组中的对象的被唤醒。 cpBodySleepWithGroup（）允许你睡觉的组对象在一起。`cpBodySleepWithGroup()`允许你将群组中的对象一起休眠。如果你通过一个新的组给`groups`
+传递`NULL`值，则它和`cpBodySleep()`功能一样。如果你为`groups`传入一个休眠的刚体，那么当`group`是唤醒状态时，`body`也会被唤醒。你可以通过这来初始化关卡并开始堆对象的预休眠状态。
+
+休眠例子
+
+```
+// Construct a pile of boxes.
+// Force them to sleep until the first time they are touched.
+// Group them together so that touching any box wakes all of them.
+cpFloat size = 20;
+cpFloat mass = 1;
+cpFloat moment = cpMomentForBox(mass, size, size);
+
+cpBody *lastBody = NULL;
+
+for(int i=0; i<5; i++){
+  cpBody *body = cpSpaceAddBody(space, cpBodyNew(mass, moment));
+  cpBodySetPos(body, cpv(0, i*size));
+  
+  cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
+  cpShapeSetFriction(shape, 0.7);
+  
+  // You can use any sleeping body as a group identifier.
+  // Here we just keep a reference to the last body we initialized.
+  // Passing NULL as the group starts a new sleeping group.
+  // You MUST do this after completely initializing the object.
+  // Attaching shapes or calling setter functions will wake the body back up.
+  cpBodySleepWithGroup(body, lastBody);
+  lastBody = body;
+}
+```
+
 
 ## 迭代器
 
+```
+typedef void (*cpBodyShapeIteratorFunc)(cpBody *body, cpShape *shape, void *data)
+void cpBodyEachShape(cpBody *body, cpBodyShapeIteratorFunc func, void *data)
+```
+对于关联到`body`且被加入到空间的每个形状调用`func`函数。`data`作为上下文值传递。使用这些回调来删除形状是安全的。
+
+```
+typedef void (*cpBodyConstraintIteratorFunc)(cpBody *body, cpConstraint *constraint, void *data)
+void cpBodyEachConstraint(cpBody *body, cpBodyConstraintIteratorFunc func, void *data)
+```
+对于关联到`body`且被加入到空间的每个约束调用`func`函数。`data`作为上下文值传递。使用这些回调来删除约束是安全的。
+
+```
+typedef void (*cpBodyArbiterIteratorFunc)(cpBody *body, cpArbiter *arbiter, void *data)
+void cpBodyEachArbiter(cpBody *body, cpBodyArbiterIteratorFunc func, void *data)
+```
+这个更有趣。对于刚体参与碰撞的每个碰撞对调用`func`函数。调用`cpArbiterGet[Bodies|Shapes]()`或者`CP_ARBITER_GET_[BODIES|SHAPES]()`将会返回刚体或者形状作为第一个参数。你可以用它来检查各种碰撞信息比如，接触地面，接触另一特定的对象，施加到对象上的碰撞力等。被碰撞处理回调或者`cpArbiterIngnore()`的传感器形状和仲裁者将不被接触图形跟踪。 
+
+注：如果你的编译器支持闭包（如Clang），还有另外一组函数可以调用，如`cpBodyEachShape_b()`等。更多信息见`chipmunk.h`。
+
+Crushing例子
+
+```
+struct CrushingContext {
+  cpFloat magnitudeSum;
+  cpVect vectorSum;
+};
+
+static void
+EstimateCrushingHelper(cpBody *body, cpArbiter *arb, struct CrushingContext *context)
+{
+  cpVect j = cpArbiterTotalImpulseWithFriction(arb);
+  context->magnitudeSum += cpvlength(j);
+  context->vectorSum = cpvadd(context->vectorSum, j);
+}
+
+cpFloat
+EstimateCrushForce(cpBody *body, cpFloat dt)
+{
+  struct CrushingContext crush = {0.0f, cpvzero};
+  cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)EstimateCrushingHelper, &crush);
+  
+  // Compare the vector sum magnitude and magnitude sum to see if
+  // how much the collision forces oppose one another.
+  cpFloat crushForce = (crush.magnitudeSum - cpvlength(crush.vectorSum))*dt;
+}
+```
+
 ## 嵌入回调
 
+这部分是残留。现在你可以看看星球演示这个例子，看如何使用嵌入回调来实现的行星重力。
+
 ## 杂项函数
+
+-  cpBool cpBodyIsStatic(const cpBody *body) - 如果`body`是静态刚体的话，返回`true`。无论是`cpSpace.staticBody`，还是由`cpBodyNewStatic()`或者`cpBodyInitStatic()`创建的刚体。
+-  cpBool cpBodyIsRogue(const cpBody *body) - 如果刚体从来没有被加入到空间的话返回`true`。
+
 
 ## 札记
 
@@ -452,15 +691,35 @@ cpFloat cpCircleShapeGetRadius(cpShape *circleShape)
 
 ## 多边形形状
 
+```
+cpPolyShape *cpPolyShapeAlloc(void)
+cpPolyShape *cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
+cpShape *cpPolyShapeNew(cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
+```
+`body`是多边形关联的刚体，`verts`是一个`cpVect`结构体数组，定义了顺时针方向的凸多边形顶点，`offset`是在刚体局部坐标系中与刚体重心的偏移量。当顶点没形成凸多边形或者不是顺时针顺序的时候会抛出一个断言。
+
+```
+cpPolyShape *cpPolyShapeInit2(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius)
+cpShape *cpPolyShapeNew2(cpBody *body, int numVerts, cpVect *verts, cpVect offset, cpFloat radius)
+```
+和上面的一样，但允许你创建一个带有半径的多边形形状。（我知道名字有点糊涂，在Chipmunk7中将会清理）
+
+```
+int cpPolyShapeGetNumVerts(cpShape *shape)
+cpVect cpPolyShapeGetVert(cpShape *shape, int index)
+cpFloat cpPolyShapeGetRadius()
+```
+多边形形状属性的`getter`函数。传递一个非多边形形状或者不存在的`index`将会抛出一个断言。
+
 ## 修改cpShpaes
 
-简短的回答是，你不能因为这些更改将只拿起一个改变形状的面的位置，而不是它的速度。长的答案是，你可以使用“不安全”的API，只要你认识到这样做会不会导致真实的物理行为。这些额外的功能都在一个单独的头chipmunk_unsafe.h定义。
+简短的回答是，你不能因为这些更改将只拿起一个改变形状的面的位置，而不是它的速度。长的答案是，你可以使用“不安全”的API，只要你认识到这样做不会导致真实的物理行为。这些额外的功能都在单独的头文件`chipmunk_unsafe.h`中定义。
 
 ## 札记
 
 -  你可以将多个碰撞形状关联到刚体上。这样你就可以创建几乎任何形状。 
 -  关联在同一个刚体上的形状不会产生冲突。你不必担心同个刚体上的形状的重叠问题。 
--  确保刚体和刚体的碰撞形状都被添加进了空间。有个例外，就是当你如果有一个外部刚体或你嵌入自身到刚体。在这种情况下，只把形状添加进空间。（to be done）
+-  确保刚体和刚体的碰撞形状都被添加进了空间。有个例外，就是当你如果有一个外部刚体或你嵌入自身到刚体。在这种情况下，只需把形状添加进空间。
 
 # Chipmunk空间：cpSpace
 
@@ -808,7 +1067,8 @@ gear->maxForce = 5000.0f;
 
 ## 现有关节类型视频演示
 
-视频下载--》优酷
+-  [Youtube地址](http://www.youtube.com/watch?v=ZgJJZTS0aMM)
+-  [优酷地址]
 
 ## 共享内存管理函数
 
