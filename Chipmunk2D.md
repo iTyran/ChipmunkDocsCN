@@ -732,7 +732,7 @@ void cpShapeFree(cpShape *shape)
 
 -  cpBB cpShapeCacheBB(cpShape *shape) – 同步形状与形状关联的刚体
 -  cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot) – 设置形状的位置和旋转角度
--  void cpResetShapeIdCounter(void) –Chipmunk使用了一个计数器，以便每一个新的形状是在空间索引中使用唯一的哈希值。因为这会影响空间中碰撞被发现和处理的顺序，你可以在每次在空间中添加新的形状时重置形状计数器。如果你不这样做，有可能模拟（非常）略有不同。
+-  void cpResetShapeIdCounter(void) – Chipmunk使用了一个计数器，以便每一个新的形状是在空间索引中使用唯一的哈希值。因为这会影响空间中碰撞被发现和处理的顺序，你可以在每次在空间中添加新的形状时重置形状计数器。如果你不这样做，有可能模拟（非常）略有不同。
 
 ## 圆形形状
 
@@ -752,6 +752,26 @@ cpFloat cpCircleShapeGetRadius(cpShape *circleShape)
 圆形形状属性的getter函数。传一个非圆形形状将会抛出一个异常。
 
 ## 线段形状
+
+```
+cpSegmentShape* cpSegmentShapeAlloc(void)
+cpSegmentShape* cpSegmentShapeInit(cpSegmentShape *seg, cpBody *body, cpVect a, cpVect b, cpFloat radius)
+cpShape* cpSegmentShapeNew(cpBody *body, cpVect a, cpVect b, cpFloat radius)
+```
+`body`是线段形状关联的刚体，`a`和`b`是端点，`radius`是线段的厚度。
+
+```
+cpVect cpSegmentShapeGetA(cpShape *shape)
+cpVect cpSegmentShapeGetA(cpShape *shape)
+cpVect cpSegmentShapeGetNormal(cpShape *shape)
+cpFloat cpSegmentShapeGetRadius(cpShape *shape)
+```
+线段属性的getter函数。传入一个非线段形状会抛出一个断言。
+
+```
+void cpSegmentShapeSetNeighbors(cpShape *shape, cpVect prev, cpVect next)
+```
+当你有一些连接在一起的线段形状时，线段仍然可以与线段间的“裂缝”碰撞。通过设置相邻线段的端点，你告诉Chipmunk来避免裂缝内部碰撞。
 
 ## 多边形形状
 
