@@ -5,7 +5,7 @@
 -----------------------------------------------------------------
 
 # Chipmunk2D 6.2.1
-Chipmunk2D是一个基于MIT协议的2D刚体物理仿真库。设计宗旨:极快、可移植、稳定、易用。出于这个原因，它已经被用于数百多游戏横跨了几乎所有系统。这些游戏包括了在iPhoneAppStore上的一些顶级出色的如*Night Sky*等许多TOP1游戏。这几年来，我投入了大量的时间来发展Chipmunk，才使得Chipmunk走到今天。如果您发现Chipmunk2D为您节省了许多事件，不妨考虑[捐赠](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552)下。这么做会使一个独立游戏制作者非常开心！
+Chipmunk2D是一个基于MIT协议的2D刚体物理仿真库。设计宗旨:极快、可移植、稳定、易用。出于这个原因，它已经被用于数百多游戏横跨了几乎所有系统。这些游戏包括了在iPhoneAppStore上的一些顶级出色的如*Night Sky*等许多TOP1游戏。这几年来，我投入了大量的时间来发展Chipmunk，才使得Chipmunk走到今天。如果您发现Chipmunk2D为您节省了许多时间，不妨考虑[捐赠](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=6666552)下。这么做会使一个独立游戏制作者非常开心！
 
 首先，我要非常感谢ErinCatto（译者注：Box2D作者）, 早在2006年的时候，Chipmunk的冲量求解器便是受到他的范例代码的启发而完成。（现在已经发展成一个成熟的物理引擎：Box2D.org) 他的持久接触的想法允许对象的稳定堆栈只进行极少的求解器迭代，而我以前的求解器为了让模拟稳定模拟会产生大量的对象或者会消耗大量的CPU资源。
 
@@ -74,9 +74,9 @@ int main(void){
   cpSpace *space = cpSpaceNew();
   cpSpaceSetGravity(space, gravity);
   
-  // Add a static line segment shape for the ground.
-  // We'll make it slightly tilted so the ball will roll off.
-  // We attach it to space->staticBody to tell Chipmunk it shouldn't be movable.
+  // 为地面创建一个静态线段形状
+  // 我们稍微倾斜线段以便球可以滚下去
+  // 我们将形状关联到space的默认静态刚体上，告诉Chipmunk该形状是不可移动的
   cpShape *ground = cpSegmentShapeNew(space->staticBody, cpv(-20, 5), cpv(20, -5), 0);
   cpShapeSetFriction(ground, 1);
   cpSpaceAddShape(space, ground);
@@ -507,9 +507,9 @@ void cpBodySleepWithGroup(cpBody *body, cpBody *group)
 休眠例子
 
 ```
-// Construct a pile of boxes.
-// Force them to sleep until the first time they are touched.
-// Group them together so that touching any box wakes all of them.
+// 构建一堆箱子
+// 强制它们进入休眠直到他们第一次被接触
+// 将它们放进一组以便接触它们任意一个都会唤醒他们
 cpFloat size = 20;
 cpFloat mass = 1;
 cpFloat moment = cpMomentForBox(mass, size, size);
@@ -523,11 +523,11 @@ for(int i=0; i<5; i++){
   cpShape *shape = cpSpaceAddShape(space, cpBoxShapeNew(body, size, size));
   cpShapeSetFriction(shape, 0.7);
   
-  // You can use any sleeping body as a group identifier.
-  // Here we just keep a reference to the last body we initialized.
-  // Passing NULL as the group starts a new sleeping group.
-  // You MUST do this after completely initializing the object.
-  // Attaching shapes or calling setter functions will wake the body back up.
+  // 你可以使用任意休眠刚体作为组别的标识符
+  // 这里我们只保存了我们初始化的最后一个刚体的引用
+  // 传入NULL值作为组别将启动一个新的休眠组
+  // 你必须在完全初始化对象后这么做
+  // 添加形状或调用setter函数将会唤醒刚体
   cpBodySleepWithGroup(body, lastBody);
   lastBody = body;
 }
@@ -1122,7 +1122,7 @@ Chipmunk的关节并不完美。销关节并不能维系两个锚点之间确切
 -  起货机：朝着另外一个物体拉一个物体无需用最大的力
 -  鼠标操作：自如的以粗暴、摇晃的鼠标输入方式来与物体交互
 
-`cpConstraint`结构体有3个属性控制着误差纠正，`maxForce`,`maxBias`以及`biasCoef.maxForce` -- to be done
+`cpConstraint`结构体有3个属性控制着误差纠正，`maxForce`,`maxBias`以及`biasCoef.maxForce`。关节或者约束在不超过该数值大小的力时才能发挥作用。如果它需要更多的力来维系自己，它将会散架。`maxBias`是误差纠正可以应用的最大速度了。如果你改变了一个关节的属性，这个关节将不得不自行纠正，一般情况下很快会这么做。通过设置最大速度，你可以使得关节工作像伺服一样，在一段较长的时间以恒定的速率校正自身。最后，`biasCoef`是在钳位最大值速度前每一步误差纠正的百分比。你可以使用它来使得关节平滑的纠正自身而不是以一个恒定的速度，但可能是三个属性中迄今为止最没用的。
 
 ```
 // Faked top down friction.
@@ -1463,7 +1463,7 @@ void cpSpaceSetDefaultCollisionHandler(
 
 ## 例子
 
-更多信息请查看[]碰撞回调范例](http://chipmunk-physics.net/release/ChipmunkLatest-Docs/examples.html#CollisionCallbacks)。
+更多信息请查看[碰撞回调范例](http://chipmunk-physics.net/release/ChipmunkLatest-Docs/examples.html#CollisionCallbacks)。
 
 # Chipmunk碰撞对：cpArbiter
 
@@ -1473,7 +1473,96 @@ Chipmunk的`cpArbiter`结构封装了一对碰撞的形状和关于他们的所�
 
 ## 内存管理
 
+你永远不需要创建或释放一个仲裁者。更重要的是，因为它们完全由空间管理，所以你永远不应该存储一个仲裁者的引用，因为你不知道他们什么时候会被释放或重新使用。在回调中使用它们，然后忘记它们或复制出你需要的信息。
+
 ## 属性
+
+```
+cpFloat cpArbiterGetElasticity(const cpArbiter *arb)
+void cpArbiterSetElasticity(cpArbiter *arb, cpFloat value)
+```
+计算碰撞对的弹性。在`preSolve()`回调中设定该值将会覆盖由空间计算的值。默认计算会将两个形状的弹性相乘。
+
+```
+cpFloat cpArbiterGetFriction(const cpArbiter *arb)
+void cpArbiterSetFriction(cpArbiter *arb, cpFloat value)
+```
+计算碰撞对的摩擦力。在`preSolve()`回调中设定该值将会覆盖由空间计算的值。默认计算会将两个形状的摩擦力相乘。
+
+```
+cpVect cpArbiterGetSurfaceVelocity(const cpArbiter *arb)
+void cpArbiterSetSurfaceVelocity(cpArbiter *arb, cpVect value)
+```
+计算碰撞对的表面速度。在`preSolve()`回调中设定该值将会覆盖由空间计算的值。默认计算会将第二个形状的表面速度从第一个形状的表面速度中减去，然后投射到碰撞的切线上。这使得只有摩擦力受到默认计算的影响。使用自定义计算，你可以使得响应就像一个弹球保险杠一样，或使得表面速度依赖于接触点的位置。
+
+注：不幸的是，有一个老的bug会让表面速度计算逆向（负值）。我真的很久没有注意到这点了。这将在Chipmunk7中得到修正，但现在由于向后兼容的原因我已经先不管它了。
+
+```
+cpDataPointer cpArbiterGetUserData(const cpArbiter *arb)
+void cpArbiterSetUserData(cpArbiter *arb, cpDataPointer data)
+```
+用户自定义指针。该值将维持形状对直到`separate()`回调被调用。
+
+注：如果你需要清理这个指针，你应该实现`separate()`回调来这么做。同时在摧毁空间的时候要小心因为仍然有可能有激活的碰撞存在。为了触发`separate()`回调，在处置它之前你需要先移除空间中的所有形状。这正是我建议的方式。见`ChipmunkDemo.c`：`ChipmunkDemoFreeSpaceChildren()`演示了如何轻松做到这一点。
+
+```
+int cpArbiterGetCount(const cpArbiter *arb)
+cpVect cpArbiterGetNormal(const cpArbiter *arb, int i)
+cpVect cpArbiterGetPoint(const cpArbiter *arb, int i)
+cpFloat cpArbiterGetDepth(const cpArbiter *arb, int i)
+```
+得到由这仲裁者或特定碰撞点，碰撞点的法向量或深度穿透跟踪的触点的数目。
+
+```
+cpBool cpArbiterIsFirstContact(const cpArbiter *arb)
+```
+如果这是两个形状开始接触的第一步则返回true。举例来说这对于声音效果很有用。如果这是特定碰撞的第一帧，在`postStep()`回调中检测碰撞能量，并用它来确定播放的声效音量。
+
+```
+void cpArbiterGetShapes(const cpArbiter *arb, cpShape **a, cpShape **b)
+void cpArbiterGetBodies(const cpArbiter *arb, cpBody **a, cpBody **b)
+```
+按照形状或者刚体在该仲裁者关联的碰撞对中定义的顺序一样得到它们。如果你像`cpSpaceAddCollisionHandler(space, 1, 2, …)`定义了个函数，你会发现`a->collision_type == 1`且`b->collision_type == 2`。
+
+碰撞回调例子
+
+```
+static void
+postStepRemove(cpSpace *space, cpShape *shape, void *unused)
+{
+  cpSpaceRemoveShape(space, shape);
+  cpSpaceRemoveBody(space, shape->body);
+  
+  cpShapeFree(shape);
+  cpBodyFree(shape->body);
+}
+
+static int
+begin(cpArbiter *arb, cpSpace *space, void *unused)
+{
+  // 得到参与碰撞的形状
+  // 顺序和你在函数定义中的顺序一致
+  // a->collision_type将是BULLET_TYPE, b->collision_type将是MONSTER_TYPE 
+  CP_ARBITER_GET_SHAPES(arb, a, b);
+  
+  // 宏展开后和下面输入一样
+  // cpShape *a, *b; cpArbiterGetShapes(arb, &a, &b);
+  
+  // 添加一个后步回调来安全从空间中移除和刚体
+  // 直接从碰撞处理函数回调中调用 cpSpaceRemove() 会引起崩溃
+  cpSpaceAddPostStepCallback(space, (cpPostStepFunc)postStepRemove, b, NULL);
+  
+  // 物体死亡，不再处理碰撞
+  return 0;
+}
+
+#define BULLET_TYPE 1
+#define MONSTER_TYPE 2
+
+// 为子弹和怪物定义一个碰撞处理函数
+// 一旦怪物被子弹集中则通过移除它的形状和刚体来立马杀死怪物
+cpSpaceAddCollisionHandler(space, BULLET_TYPE, MONSTER_TYPE, begin, NULL, NULL, NULL, NULL);
+```
 
 ## 触点集
 
@@ -1499,7 +1588,7 @@ for(int i=0; i<set.count; i++){
 ```
 void cpArbiterSetContactPointSet(cpArbiter *arb, cpContactPointSet *set)
 ```
-
+替换仲裁者的触点集。你不能改变触点的数目，但是可以改变他们的位置，法向量或穿透距离。`Sticky`演示使用它来使得物体能够获得额外量的重叠。你也可以在乒乓式风格游戏中使用它来修改基于碰撞x轴的碰撞法向量，即使板子是扁平形状。
 
 ## 帮助函数 
 
