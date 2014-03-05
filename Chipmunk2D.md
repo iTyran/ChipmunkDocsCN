@@ -81,32 +81,31 @@ int main(void){
   cpShapeSetFriction(ground, 1);
   cpSpaceAddShape(space, ground);
   
-  // Now let's make a ball that falls onto the line and rolls off.
-  // First we need to make a cpBody to hold the physical properties of the object.
-  // These include the mass, position, velocity, angle, etc. of the object.
-  // Then we attach collision shapes to the cpBody to give it a size and shape.
+  // 现在让我们来构建一个球体落到线上并滚下去
+  // 首先我们需要构建一个 cpBody 来容纳对象的物理属性
+  // 包括对象的质量、位置、速度、角度等
+  // 然后我们将碰撞形状关联到cpBody上以给它一个尺寸和形状
   
   cpFloat radius = 5;
   cpFloat mass = 1;
   
-  // The moment of inertia is like mass for rotation
-  // Use the cpMomentFor*() functions to help you approximate it.
+  // 转动惯量就像质量对于旋转一样
+  // 使用 cpMomentFor*() 来近似计算它
   cpFloat moment = cpMomentForCircle(mass, 0, radius, cpvzero);
   
-  // The cpSpaceAdd*() functions return the thing that you are adding.
-  // It's convenient to create and add an object in one line.
+  // cpSpaceAdd*() 函数返回你添加的东西
+  // 很便利在一行中创建并添加一个对象
   cpBody *ballBody = cpSpaceAddBody(space, cpBodyNew(mass, moment));
   cpBodySetPos(ballBody, cpv(0, 15));
   
-  // Now we create the collision shape for the ball.
-  // You can create multiple collision shapes that point to the same body.
-  // They will all be attached to the body and move around to follow it.
+  // 现在我们会球体创建碰撞形状
+  // 你可以为同一个刚体创建多个碰撞形状
+  // 它们将会附着关联到刚体上并移动更随
   cpShape *ballShape = cpSpaceAddShape(space, cpCircleShapeNew(ballBody, radius, cpvzero));
   cpShapeSetFriction(ballShape, 0.7);
   
-  // Now that it's all set up, we simulate all the objects in the space by
-  // stepping forward through time in small increments called steps.
-  // It is *highly* recommended to use a fixed size time step.
+  // 现在一切都建立起来了，我们通过称作时间步的小幅度时间增量来步进模拟空间中的所有物体
+  // *高度*推荐使用固定长的时间步
   cpFloat timeStep = 1.0/60.0;
   for(cpFloat time = 0; time < 2; time += timeStep){
     cpVect pos = cpBodyGetPos(ballBody);
@@ -119,7 +118,7 @@ int main(void){
     cpSpaceStep(space, timeStep);
   }
   
-  // Clean up our objects and exit!
+  // 清理我们的对象并退出
   cpShapeFree(ballShape);
   cpBodyFree(ballBody);  
   cpShapeFree(ground);
