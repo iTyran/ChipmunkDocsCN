@@ -1,5 +1,8 @@
 ## Chipmunk Joints and Constraints
 
+-  [Youtube地址](http://www.youtube.com/watch?v=ZgJJZTS0aMM)
+-  [优酷地址](http://v.youku.com/v_show/id_XNjgxNDIyMzky.html)
+
 *视频中的表格切分演示对应图表*
 
 |                  |                        |                      |                           |
