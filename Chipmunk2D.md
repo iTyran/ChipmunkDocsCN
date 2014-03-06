@@ -1152,7 +1152,7 @@ gear->maxForce = 5000.0f;
 ## 8.5 现有关节类型视频演示
 
 -  [Youtube地址](http://www.youtube.com/watch?v=ZgJJZTS0aMM)
--  [优酷地址]
+-  [优酷地址](http://v.youku.com/v_show/id_XNjgxNDIyMzky.html)
 
 ## 8.6 共享内存管理函数
 
