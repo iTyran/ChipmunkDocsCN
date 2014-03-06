@@ -337,12 +337,12 @@ void cpBodyDestroy(cpBody *body)
 void cpBodyFree(cpBody *body)
 ```
 
-如上是一套标准的Chipmunk内存管理函数。`m`和`i`是刚体的质量和转动惯性。猜想刚体的质量通常是好的，但是猜想刚体的转动惯性却会导致一个很差的模拟。在任何关联到刚体的形状或者约束从空间移除之前注意不要释放刚体。
+如上是一套标准的Chipmunk内存管理函数。`m`和`i`是刚体的质量和转动惯量。猜想刚体的质量通常是好的，但是猜想刚体的转动惯量却会导致一个很差的模拟。在任何关联到刚体的形状或者约束从空间移除之前注意不要释放刚体。
 
 
 ## 5.3 创建额外静态刚体
 
-每一个`cpSpace`都有一个可以直接使用的内建的静态刚体，制作你自己的也非常便利。一个潜在的用途就是用在关卡编辑器中。通过将关卡的块关联到静态刚体，你仍然可以相互独立的移动和旋转块。然后你要做的就是在结束后调用`cpSpaceRehashStatic()`来重建静态碰撞检测的数据。
+每一个`cpSpace`都有一个可以直接使用的内置的静态刚体，构建你自己的也非常便利。一个潜在的用途就是用在关卡编辑器中。通过将关卡的物块关联到静态刚体，你仍然可以相互独立的移动和旋转物块。然后你要做的就是在结束后调用`cpSpaceRehashStatic()`来重建静态碰撞检测的数据。
 
 关于流氓和静态刚体的更多信息，请看Chipmunk空间。
 
@@ -368,7 +368,7 @@ cpFloat cpBodyGetMoment(const cpBody *body)
 void cpBodySetMoment(cpBody *body, cpFloat i)
 ```
 
-刚体的转动惯量（？？）。惯性就像刚体的旋转质量。请请参阅下面的函数来帮助计算惯量。
+刚体的转动惯量（MoI（译者注：Moment Of Inertia即转动惯量的缩写）或有时只说惯量）。惯量就像刚体的旋转质量。请查阅下面的函数来帮助计算惯量。
 
 ```
 cpVect cpBodyGetPos(const cpBody *body)
@@ -433,10 +433,10 @@ cpSpace* cpBodyGetSpace(const cpBody *body)
 cpDataPointer cpBodyGetUserData(const cpBody *body)
 void cpBodySetUserData(cpBody *body, const cpDataPointer value)
 ```
-使用数据指针。使用该指针从回调中获取拥有该刚体的游戏对象。
+使用数据指针。使用该指针从回调中获取拥有该刚体的游戏对象的引用。
 
 
-## 5.5 转动惯性和一些帮助函数
+## 5.5 转动惯量和面积帮助函数
 
 使用以下函数来近似计算出刚体的转动惯量，如果想得到多个，将结果相加在一起。
 
@@ -464,9 +464,9 @@ cpFloat composite = cpMomentForBox(boxMass, 1, 4) + cpMomentForCircle(circleMass
 
 如果你想近似计算质量或密度诸如此类的东西可以使用下列函数来获取Chipmunk形状区域。
 
--  cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2) – 空心圆形状区域
--  cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r) – Area of a beveled segment. (Will always be zero if radius is zero)
--  cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts) – Signed area of a polygon shape. Returns a negative number for polygons with a backwards winding.
+-  cpFloat cpAreaForCircle(cpFloat r1, cpFloat r2) – 空心圆形状面积
+-  cpFloat cpAreaForSegment(cpVect a, cpVect b, cpFloat r) – 斜线段面积。（如果半径为0的话永远为0）
+-  cpFloat cpAreaForPoly(const int numVerts, const cpVect *verts) – 多边形形状的面积。多边形为凹多边形时返回一个负值。
 
 
 ## 5.6 坐标系转换函数
@@ -593,7 +593,6 @@ EstimateCrushForce(cpBody *body, cpFloat dt)
 
 -  cpBool cpBodyIsStatic(const cpBody *body) - 如果`body`是静态刚体的话，返回`true`。无论是`cpSpace.staticBody`，还是由`cpBodyNewStatic()`或者`cpBodyInitStatic()`创建的刚体。
 -  cpBool cpBodyIsRogue(const cpBody *body) - 如果刚体从来没有被加入到空间的话返回`true`。
-
 
 ## 5.12 札记
 
@@ -1058,7 +1057,7 @@ cpFloat cpConstraintGetMaxForce(const cpConstraint *constraint)
 void cpConstraintSetMaxForce(cpConstraint *constraint, cpFloat value)
 ```
 
--  关节误差百分比用来维系一秒后的不固定。这和碰撞偏差机制完全一样，但是这会修正关节的误差而不是重叠碰撞。
+-  关节误差百分比一秒钟后仍然没得到修正。这和碰撞偏差机制完全一样，但是这会修正关节的误差而不是重叠碰撞。
 
 ```
 cpFloat cpConstraintGetErrorBias(const cpConstraint *constraint)
@@ -1113,17 +1112,19 @@ if(breakableJoint){
 
 ```
 
-要访问特定关节类型的属性，使用提供的存取器函数（如cpPinJointGetAnchr1()）。查看属性列表来获得更多的信息。
+要访问特定关节类型的属性，使用提供的getter和setter函数（如cpPinJointGetAnchr1()）。更多信息请查看属性列表。
 
 ## 8.3 反馈纠错
 
-Chipmunk的关节并不完美。销关节并不能维系两个锚点之间确切正确的距离，枢轴关节同样也不能保持关联的锚点完全在一起。他们被设计通过自纠错来处理这个问题。在Chipmunk5中，我们有很多额外的控制来实现关节对自身的纠错，甚至可以使用这个特性，以独特的方式使用关节来创建一些物理效果。
+Chipmunk的关节并不完美。销关节并不能维系两个锚点之间确切正确的距离，枢轴关节同样也不能保持关联的锚点完全在一起。他们被设计通过自纠错来处理这个问题。在Chipmunk5中，你有很多额外的控制来实现关节对自身的纠错，甚至可以使用这个特性，以独特的方式使用关节来创建一些物理效果。
 
 -  伺服马达：如 打开/关闭门或者旋转物件，无需用最大的力
 -  起货机：朝着另外一个物体拉一个物体无需用最大的力
--  鼠标操作：自如的以粗暴、摇晃的鼠标输入方式来与物体交互
+-  鼠标操作：以粗暴、摇晃的鼠标输入方式自如的与物体交互
 
 `cpConstraint`结构体有3个属性控制着误差纠正，`maxForce`,`maxBias`以及`biasCoef.maxForce`。关节或者约束在不超过该数值大小的力时才能发挥作用。如果它需要更多的力来维系自己，它将会散架。`maxBias`是误差纠正可以应用的最大速度了。如果你改变了一个关节的属性，这个关节将不得不自行纠正，一般情况下很快会这么做。通过设置最大速度，你可以使得关节工作像伺服一样，在一段较长的时间以恒定的速率校正自身。最后，`biasCoef`是在钳位最大值速度前每一步误差纠正的百分比。你可以使用它来使得关节平滑的纠正自身而不是以一个恒定的速度，但可能是三个属性中迄今为止最没用的。
+
+
 
 ```
 // Faked top down friction.
@@ -1697,7 +1698,7 @@ typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points,
 cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 ```
 
-关于上面代码：查询`space`来找到和`shape`重叠的形状。使用层和群组来过滤掉`shape`最后得到匹配。
+查询`space`来找到和`shape`重叠的所有形状。使用`shape`的层和群组来过滤筛选得到匹配。`func`函数由每个重叠的形状调用，附带一个临时的`cpContactPointSet`的一个指针和传递给`cpSpaceBBQuery()`的`data`参数。包括传感器形状。
 
 ## 13.5 闭包
 
