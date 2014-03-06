@@ -1655,8 +1655,34 @@ typedef struct cpSegmentQueryInfo {
 } cpSegmentQueryInfo;
 
 ```
+分类查询返回的信息不只是一个简单的是或否，他们也会返回形状被击中的位置以及被击中位置的表面的法向量。`t`是该查询的开始点和结束点之间的百分比。如果你需要空世界空间中的击中点或者从开始点的绝对距离，可以查看下面的线段查询帮助函数。如果线段查询的开始点在形状内部，则`t = 0`并且`n = cpvzero`。
 
+```
+cpBool cpShapeSegmentQuery(cpShape *shape, cpVect a, cpVect b, cpSegmentQueryInfo *info)
+```
 
+执行从`a`到`b`的线段与单一形状`shape`的线段查询。`info`必须是一个指向`cpSegmentQueryInfo`结构体的有效的指针，该结构体会被光线投射信息（raycast info）初始化。
+
+```
+typedef void (*cpSpaceSegmentQueryFunc)(cpShape *shape, cpFloat t, cpVect n, void *data)
+
+void cpSpaceSegmentQuery(
+	cpSpace *space, cpVect start, cpVect end,
+	cpLayers layers, cpGroup group,
+	cpSpaceSegmentQueryFunc func, void *data
+)
+```
+
+沿着线段的`start`到`end`使用给定的`layers`和`groups`来查询`space`过滤筛选出匹配。`func`函数被调用，附带着线段和任何被发现的形状表面的法向量之间的归一化距离，还有传递给`cpSpacePointQuery()`的data参数。传感器类形状也被包括在内。
+
+```
+cpShape *cpSpaceSegmentQueryFirst(
+	cpSpace *space, cpVect start, cpVect end,
+	cpLayers layers, cpGroup group,
+	cpSegmentQueryInfo *info
+)
+```
+沿着线段的`start`到`end`使用给定的`layers`和`groups`来查询`space`过滤筛选出匹配。只有遇到的第一个形状会被返回并结束搜索，如果没有发现形状则返回`NULL`。`info`指向的结构体将会被光线投射信息初始化，除非`info`是`NULL`。传感器类形状将被忽略。
 
 ### 线段查询辅助函数：
 
@@ -1698,7 +1724,7 @@ typedef void (*cpSpaceShapeQueryFunc)(cpShape *shape, cpContactPointSet *points,
 cpBool cpSpaceShapeQuery(cpSpace *space, cpShape *shape, cpSpaceShapeQueryFunc func, void *data);
 ```
 
-查询`space`来找到和`shape`重叠的所有形状。使用`shape`的层和群组来过滤筛选得到匹配。`func`函数由每个重叠的形状调用，附带一个临时的`cpContactPointSet`的一个指针和传递给`cpSpaceBBQuery()`的`data`参数。包括传感器形状。
+查询`space`来找到和`shape`重叠的所有形状。使用`shape`的层和群组来过滤筛选得到匹配。`func`函数由每个重叠的形状调用，附带一个临时的`cpContactPointSet`的一个指针和传递给`cpSpaceBBQuery()`的`data`参数。传感器类形状也包括在内。
 
 ## 13.5 闭包
 
