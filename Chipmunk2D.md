@@ -579,8 +579,7 @@ EstimateCrushForce(cpBody *body, cpFloat dt)
   struct CrushingContext crush = {0.0f, cpvzero};
   cpBodyEachArbiter(body, (cpBodyArbiterIteratorFunc)EstimateCrushingHelper, &crush);
   
-  // Compare the vector sum magnitude and magnitude sum to see if
-  // how much the collision forces oppose one another.
+  // 通过比较向量和以及幅度和来查看碰撞的力量彼此相对有多大
   cpFloat crushForce = (crush.magnitudeSum - cpvlength(crush.vectorSum))*dt;
 }
 ```
@@ -941,11 +940,9 @@ Chipmunk6正式支持2个空间索引。默认是轴对齐包围盒树，该灵�
 
 有时，你可能需要更新形状的碰撞检测数据。如果你移动静态形状或者刚体，你必须这样做来让Chipmunk知道它需要更新碰撞数据。你可能还希望手动为移动过的普通形状更新碰撞数据，并且仍然想进行查询。
 
-```
 -  void cpSpaceReindexShape(cpSpace *space, cpShape *shape) – 重新索引一个指定的形状
 -  void cpSpaceReindexShapesForBody(cpSpace *space, cpBody *body) - 重新索引指定刚体上的所有形状
 -  void cpSpaceReindexStatic(cpSpace *space) – 重新索引所有静态形状。一般只更新改变的形状会比较快
-```
 
 ## 7.8 迭代器
 
@@ -1127,12 +1124,10 @@ Chipmunk的关节并不完美。销关节并不能维系两个锚点之间确切
 
 
 ```
-// Faked top down friction.
-
-// A pivot joint configured this way will calculate friction against the ground for games with a top down perspective.
-// Because the joint correction is disabled, the joint will not recenter itself and only apply to the velocity.
-// The force the joint applies when changing the velocity will be clamped by the max force
-// and this causes it to work exactly like friction!
+// 在一个顶视角的游戏中，采用这种配置的枢轴关节将会计算与地面之间的摩擦
+// 因为关节纠正被禁用，所以关节不会重新摆正自身并只会影响速度。
+// 当速度改变时，关节施加的力会被最大力钳位
+// 这样它就会像摩擦一样工作
 cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, body, cpvzero, cpvzero));
 pivot->maxBias = 0.0f; // disable joint correction
 pivot->maxForce = 1000.0f;
@@ -1142,10 +1137,9 @@ cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(staticBody, body
 gear->maxBias = 0.0f; // disable joint correction
 gear->maxForce = 5000.0f;
 
-// Also, instead of connecting the joints to a static body, you can connect them to an infinite mass rogue body.
-// You can then use the rogue body as a control body to the connected body. See the Tank demo as an example.
+// 另外，你可以将关节连接到一个无限大质量的流氓刚体上来取代连接到一个静态刚体上
+// 你可以使用流氓刚体作为控制刚体来连接。可以查看`Tank`演示例子。
 ```
-
 
 ## 8.4 约束和碰撞形状
 
