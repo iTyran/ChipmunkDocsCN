@@ -1,5 +1,16 @@
 ![](http://chipmunk-physics.net/release/ChipmunkLatest-Docs/images/logo1_med.png)
 
+> Chipmunk2D中文手册，由泰然翻译组翻译。转载请注明出处。
+
+> 翻译：[ChildhoodAndy](http://childhood.logdown.com)（完成了大部分的翻译）， [u0u0](http://weibo.com/lkncastle)， [gloryming](http://weibo.com/gloryming)。
+
+> 校对：[涵紫](http://weibo.com/u/3503103601)
+
+> github贡献地址：[https://github.com/iTyran/ChipmunkDocsCN](https://github.com/iTyran/ChipmunkDocsCN)
+
+> 欢迎大家斧正错误，提交PR。
+
+
 # Chipmunk2D中文手册
 
 -----------------------------------------------------------------
@@ -1132,7 +1143,7 @@ cpConstraint *pivot = cpSpaceAddConstraint(space, cpPivotJointNew2(staticBody, b
 pivot->maxBias = 0.0f; // disable joint correction
 pivot->maxForce = 1000.0f;
 
-// The pivot joint doesn't apply rotational forces, use a gear joint with a ratio of 1.0 for that.
+// 枢轴关节并不施加旋转力，使用一个比率为1.0的齿轮关节来替代
 cpConstraint *gear = cpSpaceAddConstraint(space, cpGearJointNew(staticBody, body, 0.0f, 1.0f));
 gear->maxBias = 0.0f; // disable joint correction
 gear->maxForce = 5000.0f;
