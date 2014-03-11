@@ -178,12 +178,12 @@ SOFTWARE.
 -  [Chipmunk论坛](http://chipmunk2d.net/forum) - Chipmunk2D官方论坛
 -  [Howling Moon Software](http://howlingmoonsoftware.com/) - 我合办的软件公司（我们提供外包工作）
 -  [Chipmunk2D Pro](http://chipmunk2d.net/chipmunkPro.php) - Chipmunk的增强版本，我们为ARM或者多核平台做了一些特定的优化，如从图像或程序数据中进行自动几何操作，以及为Objective-C做了API封装。
--  [游戏](http://chipmunk2d.net/games.php) - 使用Chimunk做的游戏清单。至少一小部分我们知道。
+-  [游戏](http://chipmunk2d.net/games.php) - 使用Chipmunk做的游戏清单。至少一小部分我们知道。
 
 # 2. Chipmunk2D 基础
 ## 2.1 概述
 
-在Chimpmunk中有4种基本对象类型，分别是
+在Chipmunk中有4种基本对象类型，分别是
 
 -  刚体：一个刚体容纳着一个对象的物理属性（如质量、位置、角度、速度等）。默认情况下，它并不具有任何形状，直到你为它添加一个或者多个碰撞形状进去。如果你以前做过物理粒子，你会发现它们的不同之处是刚体可以旋转。在游戏中，通常刚体都是和一个精灵一一对应关联的。你应该构建你的游戏以便可以使用刚体的位置和角度来绘制你的精灵。
 -  碰撞形状：因为形状与刚体相关联，所以你可以为一个刚体定义形状。为了定义一个复杂的形状，你可以给刚体绑定足够多的形状。形状包含着一个对象的表面属性如摩擦力、弹性等。
@@ -223,11 +223,15 @@ SOFTWARE.
 -  cpGroup: 碰撞组唯一标识符，默认是unsigned int。当你不想区分组别的时候，可以定义一个`CP_NO_GROUP`。自定义类型必须支持`==`运算符
 -  cpLayers: 该类型被用作为层的掩码，默认是unsigned int。`CP_ALL_LAYERS`被用来定义为所有层位。自定义类型必须支持位操作`&`运算符
 
+如果你正在写游戏引擎或者在Chipmunk之上进行语言绑定，你可能希望使用对象的引用代替整数来表示碰撞类型和碰撞组。我经常使用类指针来表示碰撞类型，游戏对象指针来表示碰撞组。这比到处定义枚举表简单多了。
+
+注意：在iphone上，为了性能和兼容性，cpFloat被定义为float，cpVect是CGPoint的别名。
+
 ## 2.4 数学运算
 
 首先，Chipmunk默认使用双精度浮点数进行数学计算。在大多数现代台式机处理器下这样很可能更快点，并意味着你可以不用过多担心浮点舍入引起的误差。在编译库的时候你可以修改Chipmunk使用的浮点类型。请查看`chipmunk_types.h`。
 
-Chipmunk为一些常用的数学函数定义了别名以便你可以用Chimpmunk的浮点型来代表`float`或者`double`类型计算。在你的代码里，这或许不是一个很充分的理由，但在你使用了错误的`float/double`版本的数学函数而造成了2%的性能损失，请使用这些别名函数。
+Chipmunk为一些常用的数学函数定义了别名以便你可以用Chipmunk的浮点类型来代表`float`或者`double`类型。在你的代码里，或许没有充分的理由去使用这些别名，除非你预计今后你可能会改变Chipmunk的浮点类型，而且你很介意错误的使用`float/double`版本的数学函数所造成的2%的性能下降。
 
 有一些函数或许你会发现非常有用：
 
