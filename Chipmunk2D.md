@@ -195,18 +195,19 @@ SOFTWARE.
 对于你将使用的大多数结构体来说，Chipmunk采用了一套或多或少的标准和简单直接的内存管理方式。拿`cpSpace`结构体来举例：
 
 -  cpSpaceNew()  - 分配并初始化一个`cpSpace`结构体。它先后调用了`cpSpaceAlloc()`和`cpSpaceInit(cpSpace *space)`
--  cpSpaceFree(cpSpace *space) - 破环并释放`cpSpace`结构体
+-  cpSpaceFree(cpSpace *space) - 销毁并释放`cpSpace`结构体
 
-你对任何你所分配过空间的结构体都负有释放的责任。 Chipmunk没有采用引用计数和垃圾回收机制。 如果你调用了一个`new`函数，则必须匹配调用`free`函数来释放空间，否则会引起内存泄漏。
+你有责任释放掉任何你分配了内存空间的结构体。 Chipmunk没有采用引用计数和垃圾回收机制。 如果你调用了一个`new`函数，则必须匹配调用`free`函数来释放空间，否则会引起内存泄漏。
 
-另外当你需要在栈上分配临时结构体，或者写一个语言绑定又或者在一个低内存容量的环境下编码，这时你需要更多分配和初始化的控制权，便可以使用下面的函数。*大部分人永远都不会使用下面几个函数。*
+另外当你在栈上分配临时结构体，或者写一个语言绑定,又或者在一个内存受限的环境下编码的时候，如果你在内存的分配和初始化上需要更多的控制权，便可以使用下面的函数。*大部分人永远都不会使用这些函数。*
 
--  cpSpaceAlloc() - 为一个`cpSpace`结构体分配空间，但不进行初始化。所有的分配空间的函数看起来大致就像这样:`return (cpSpace *)cpcalloc(1, sizeof(cpSpace));`。 如果需要的话你可以自己实现自己的分配空间函数
+-  cpSpaceAlloc() - 为一个`cpSpace`结构体分配空间，但不进行初始化。所有的分配空间的函数看起来大致就像这样:`return (cpSpace *)cpcalloc(1, sizeof(cpSpace));`。 如果需要的话你可以自己实现自己的分配空间函数。把内存空间重置为0，不是硬性要求。
 -  cpSpaceInit(cpSpace *space) - 初始化`cpSpace`结构体
 -  cpSpaceDestroy(cpSpace *space) - 释放由`cpSpaceInit()`申请的所有内存空间，但并不释放`cpSpace`结构体本身
 
-就像`new`和`free`函数的对应调用一样，任何由`alloc`函数分配的内存都要由`cpfree()`或类似的函数来释放，任何由`init`函数初始化申请空间的对象都要通过`destroy`函数来释放。
+就像`new`和`free`函数的对应调用一样，任何由`alloc`函数分配的内存都要由`cpfree()`或类似的函数来释放，任何`init`函数调用都必须对应`destroy`函数调用。
 
+为了能够轻松集成垃圾回收或其他内存管理机制，Chipmunk有若干可以被重写的编译时定义(cpcalloc(), cprealloc(), cpfree())。如果你不是通过带有垃圾回收的语言使用Chipmunk，我强烈推荐使用libGC。它为基于C的语言提供了一个几乎透明的垃圾收集器。
 
 ## 2.3 基本类型
 
