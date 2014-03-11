@@ -36,7 +36,7 @@ C API的另一个问题是访问限制。Chipmunk有许多结构体，字段，�
 
 我们同时在出售Chipmunk2D的扩展版本： Chipmunk2D Pro。主要的特性有：ARM和NEON指令优化，多线程优化，一个为iOS/Mac开发提供的Objective-C封装层，以及自动几何工具。优化主要集中在提高移动性能，同时多线程特性能在支持pthread的平台运行。Objective-C封装层能让你无缝整合到Cocos2D或UIKit等框架，并能获得本地内存管理的优势（包括ARC）。同时Pro版本有大量优秀的API扩展。自动几何工具让你能从图像数据或程序生成并使用几何。
 
-另外，出售Chipmunk2D Pro让我们得以生存，并保持Chipmunk2D的开源。捐献也能棒，但是购买Pro版本你将获得捐献之外的某些东西。
+另外，出售Chipmunk2D Pro让我们得以生存，并保持Chipmunk2D的开源。捐献也很棒，但是购买Pro版本你将获得捐献之外的某些东西。
 
 ## 1.4 下载与编译
 
