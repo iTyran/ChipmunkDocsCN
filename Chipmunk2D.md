@@ -1243,7 +1243,7 @@ cpPinJoint *cpPinJointInit(cpPinJoint *joint, cpBody *a, cpBody *b, cpVect anchr
 cpConstraint *cpPinJointNew(cpBody *a, cpBody *b, cpVect anchr1, cpVect anchr2)
 ```
 
-`a`和`b`是被连接的两个刚体，`anchr1`和`anchr2`是这两个刚体的锚点。当关节被创建的时候距离便被确定，如果你想要设定一个特定的距离，使用`setter`函数来重写它。
+`a`和`b`是被连接的两个刚体，`anchr1`和`anchr2`是这两个刚体的锚点。当关节被创建的时候距离便被确定，如果你想要设定一个特定的距离，使用`setter`函数来重新设定该值。
 
 ### 属性
 
