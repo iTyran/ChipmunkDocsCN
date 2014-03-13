@@ -624,12 +624,12 @@ EstimateCrushForce(cpBody *body, cpFloat dt)
 
 如果你愿意，你可以在一个刚体上添加任意数量的形状。这就是为什么两种类型（形状和刚体）是分离开的。这将会让你足够灵活的来给相同对象的不同区域提供不同的摩擦力、弹性以及回调值。
 
-当创建不同类型的形状的时候，你将永远得到一个`cpShape*`指针返回。这是因为Chipmunk的形状是不透明的类型。想象具体的碰撞形状类型如`cpCircleShape`, `cpSegmentShape`和`cpPolyShape`, 他们都是`cpShape`的私有子类。你仍然可以使用`getter`函数来获取他们的属性，但不要将`cpShape`指针转成他们的特定类型指针。
+不管创建何种类型的形状，你总是会得到一个`cpShape*`指针。这是因为Chipmunk的形状是不透明的类型。想象一下具体的碰撞形状类型，如`cpCircleShape`, `cpSegmentShape`和`cpPolyShape`, 他们都是`cpShape`的私有子类。但是你仍然可以使用`getter`函数来获取他们的属性，而不需要将`cpShape`指针转成他们特定的类型指针。
 
 
 ## 6.1 札记
 
-Chipmunk直到 6.1.2 版本才支持线段、线段碰撞。由于兼容性的原因，你必须明确地全局调用`cpEnableSegmentToSegmentCollisions（）`来启用它们。 （感谢LegoCylon对此的帮助）
+Chipmunk直到 6.1.2 版本才支持线段、线段碰撞。由于兼容性的原因，你必须调用`cpEnableSegmentToSegmentCollisions()`来全局明确地启用它们。 （感谢LegoCylon对此的帮助）
 
 
 ## 6.2 属性
@@ -661,28 +661,28 @@ cpFloat cpShapeGetElasticity(const cpShape *shape)
 void cpShapeSetElasticity(cpShape *shape, cpFloat value)
 ```
 
-上面说的是形状的弹性。值0.0表示没有反弹，而值为1.0将提供一个“完美”的反弹。然而由于使用1.0或更高的值会导致模拟不精确，所以不推荐。碰撞的弹性是由单个形状的弹性相乘得到。
+形状的弹性。0.0表示没有弹性，1.0b表示“富有”弹性。然而由于存在模拟误差，不推荐使用1.0或更高的值。碰撞的弹性是由单个形状的弹性相乘得到。
 
 ```
 cpFloat cpShapeGetFriction(const cpShape *shape)
 void cpShapeSetFriction(cpShape *shape, cpFloat value)
 ```
 
-上面说的是摩擦系数。Chipmunk使用的是库仑摩擦力模型，0.0值表示无摩擦。碰撞间的摩擦是由单个形状的摩擦相乘找到。[摩擦系数表](http://www.roymech.co.uk/Useful_Tables/Tribology/co_of_frict.htm)
+摩擦系数。Chipmunk使用的是库仑摩擦力模型，0.0值表示无摩擦。碰撞间的摩擦是由单个形状的摩擦相乘找到。[摩擦系数表](http://www.roymech.co.uk/Useful_Tables/Tribology/co_of_frict.htm)
 
 ```
 cpVect cpShapeGetSurfaceVelocity(const cpShape *shape)
 void cpShapeSetSurfaceVelocity(cpShape *shape, cpVect value)
 ```
 
-上面说的是物体的表面速度。可用于创建传送带或走动的玩家。此值在计算摩擦时才会使用，而不是用于解决碰撞。
+物体的表面速度。可用于创建传送带或移动的玩家。此值在计算摩擦时才会使用，不影响碰撞。
 
 ```
 cpCollisionType cpShapeGetCollisionType(const cpShape *shape)
 void cpShapeSetCollisionType(cpShape *shape, cpCollisionType value)
 ```
 
-您可以为Chipmunk的碰撞形状指定类型从而在接触特定类型物体的时候触发回调。更多信息请参见回调部分。
+你可以为Chipmunk的碰撞形状指定类型从而在接触特定类型物体的时候触发回调。更多信息请参见回调部分。
 
 ```
 cpGroup cpShapeGetGroup(const cpShape *shape)
@@ -701,22 +701,22 @@ void cpShapeSetLayers(cpShape *shape, cpLayers value)
 cpSpace* cpShapeGetSpace(const cpShape *shape)
 ```
 
-得到形状所添加进去的空间。
+获取形状所属的空间。
 
 ```
 cpDataPointer cpShapeGetUserData(const cpShape *shape)
 void cpShapeSetUserData(cpShape *shape, cpDataPointer value)
 ```
 
-上面说的是用户定义的数据指针。如果你设置将其指向形状关联的游戏对象，那么你可以从Chipmunk回调中访问你的的游戏对象。
+用户自定义数据的指针。如果你设置将其指向形状关联的游戏对象，那么你可以在Chipmunk回调中访问你的游戏对象。
 
 ## 6.3 碰撞过滤
 
 Chipmunk 有两种主要的途径来忽略碰撞: **群组和层**。
 
-群组是为了忽略一个复杂对象部分之间的碰撞。玩偶是一个很好的例子。当联合手臂和躯干的时候，他们可以重叠。群组允许这样做。相同群组间的形状不产生碰撞。所以通过将一个布娃娃的所有形状放在同一群组中，就会阻止其碰撞自身的其它部件。
+群组是为了忽略一个复杂对象内部元素之间的碰撞。布娃娃是一个很好的例子。当把手臂和躯干连接到一起的时候，你会希望它们可以部分重叠。群组允许这样做。相同群组间的形状不产生碰撞。所以通过将一个布娃娃的所有形状放在同一群组中，就会阻止其碰撞自身的其它部件。
 
-层允许你将碰撞的形状分离在相互排斥的位面。形状不止可以在一个层上，形状与形状发生碰撞，而两者必须至少在一个相同的层上。举一个简单的例子，比如说形状A是在第1层，形状B是在第2层和形状C是在层1和2上。形状A和B不会互相碰撞，但形状C将与这两个A和B发生碰撞
+层允许你将碰撞的形状分离在互斥的位面。形状可以隶属于一个或多个层，而两个形状要发生碰撞，必须有至少一个层是相同的。举一个简单的例子，比如说形状A是在第1层，形状B是在第2层和形状C是在层1和2上。形状A和B不会互相碰撞，但形状C将与这两个A和B发生碰撞
 
 层也可以用于建立基于碰撞的规则。比如说在你的游戏中有四种类型的形状。玩家，敌人，玩家子弹，敌人子弹。玩家应该和敌人发生碰撞，但子弹却不应该和发射者碰撞。图表类似下图：
 
@@ -729,9 +729,9 @@ Chipmunk 有两种主要的途径来忽略碰撞: **群组和层**。
 | Enemy Bullet | -      | -      | -              | -           |
 
 
-图表中‘-’是多余的斑点，数字的地方应该发生碰撞。您可以使用层要定义每个规则。然后将层添加到每个类型：玩家应该在层1和2，敌人应该是在层1和3中，玩家的子弹应该是在层3中，以及敌人的子弹应该是在层2中。这种处理层作为为规则的方式，可以定义多达32个规则。默认`cpLayers`类型为`unsigned int`其中在大多数系统是32位的。如果你需要更多的比特来完成工作, 你可以在`chipmunk_types.h`中重新定义`cpLayers`类型。
+图表中‘-’代表冗余，数字的地方应该发生碰撞。你可以每一个规则对应一个层。然后将层添加到类型上：玩家应该在层1和2中，敌人应该是在层1和3中，玩家的子弹应该是在层3中，敌人的子弹应该是在层2中。这种把层当作规则的方式，可以定义多达32个规则。默认`cpLayers`类型为`unsigned int`在大多数系统是32位的。如果你需要更多的比特来完成工作, 你可以在`chipmunk_types.h`中重新定义`cpLayers`类型。
 
-还有最后一个方法通过碰撞处理函数来过滤碰撞。见回调的部分来获取更多信息。碰撞处理程序可以更灵活，但它们也是最慢的方法。所以，你要优先尝试使用群组或层。
+还有最后一个方法通过碰撞处理函数来过滤碰撞。详情请见回调部分。碰撞处理程序可以更灵活，但它们也是最慢的方法。所以，你要优先尝试使用群组或层。
 
 ## 6.4 内存管理函数
 
@@ -743,9 +743,9 @@ void cpShapeFree(cpShape *shape)
 
 ## 6.5 其他函数
 
--  cpBB cpShapeCacheBB(cpShape *shape) – 同步形状与形状关联的刚体
+-  cpBB cpShapeCacheBB(cpShape *shape) – 同步`shape`和与之关联的刚体
 -  cpBB cpShapeUpdate(cpShape *shape, cpVect pos, cpVect rot) – 设置形状的位置和旋转角度
--  void cpResetShapeIdCounter(void) – Chipmunk使用了一个计数器，以便每一个新的形状是在空间索引中使用唯一的哈希值。因为这会影响空间中碰撞被发现和处理的顺序，你可以在每次空间中添加新的形状时重置形状计数器。如果你不这样做，有可能模拟（非常）略有不同。
+-  void cpResetShapeIdCounter(void) – Chipmunk使用了一个计数器，以便每一个新的形状都能在空间索引中使用唯一的哈希值。因为会影响发现和处理碰撞的顺序，所以每次用新的形状重建空间时你可以重置形状计数器。否则，模拟可能会有很（极）小的差别。
 
 ## 6.6 圆形形状
 
@@ -755,14 +755,14 @@ cpCircleShape *cpCircleShapeInit(cpCircleShape *circle, cpBody *body, cpFloat ra
 cpShape *cpCircleShapeNew(cpBody *body, cpFloat radius, cpVect offset)
 ```
 
-`body` 是圆形形状关联的刚体。`offset` 是在刚体局部坐标系内，与刚体中心的偏移量。
+`body`是圆形形状关联的刚体。`offset`是在刚体局部坐标系内，与刚体中心的偏移量。
 
 ```
 cpVect cpCircleShapeGetOffset(cpShape *circleShape)
 cpFloat cpCircleShapeGetRadius(cpShape *circleShape)
 ```
 
-圆形形状属性的getter函数。传一个非圆形形状将会抛出一个异常。
+圆形形状属性的getter函数。传一个非圆形形状将会抛出一个断言。
 
 ## 6.7 线段形状
 
@@ -793,13 +793,13 @@ cpPolyShape *cpPolyShapeAlloc(void)
 cpPolyShape *cpPolyShapeInit(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
 cpShape *cpPolyShapeNew(cpBody *body, int numVerts, const cpVect *verts, cpVect offset)
 ```
-`body`是多边形关联的刚体，`verts`是一个`cpVect`结构体数组，定义了顺时针方向的凸多边形顶点，`offset`是在刚体局部坐标系中与刚体重心的偏移量。当顶点没形成凸多边形或者不是顺时针顺序的时候会抛出一个断言。
+`body`是多边形关联的刚体，`verts`是一个`cpVect`结构体数组，定义了一个沿顺时针围成的凸多边形（译者注：原文是凸包，[维基百科-凸包](http://zh.wikipedia.org/wiki/%E5%87%B8%E5%8C%85)），`offset`是在刚体局部坐标系中与刚体重心的偏移量。当顶点没形成凸多边形或者不是顺时针顺序的时候会抛出一个断言。
 
 ```
 cpPolyShape *cpPolyShapeInit2(cpPolyShape *poly, cpBody *body, int numVerts, const cpVect *verts, cpVect offset, cpFloat radius)
 cpShape *cpPolyShapeNew2(cpBody *body, int numVerts, cpVect *verts, cpVect offset, cpFloat radius)
 ```
-和上面的一样，但允许你创建一个带有半径的多边形形状。（我知道名字有点糊涂，在Chipmunk7中将会清理）
+和上面的一样，但允许你创建一个带有半径的多边形形状。（我知道命名有些词不达意，在Chipmunk7中将会清理）
 
 ```
 int cpPolyShapeGetNumVerts(cpShape *shape)
@@ -808,15 +808,80 @@ cpFloat cpPolyShapeGetRadius()
 ```
 多边形形状属性的`getter`函数。传递一个非多边形形状或者不存在的`index`将会抛出一个断言。
 
+### 盒子
+
+因为盒子在物理游戏中太普遍，Chipmunk提供了创建盒形多边形的快捷方式。盒子总是会被居中放置在它们所关联的刚体的重心位置。如果你想创建一个偏离中心的盒子，必须使用`cpPolyShapeNew()`或`cpPolyShapeInit()`。
+
+```
+cpPolyShape *cpBoxShapeInit(cpPolyShape *poly, cpBody *body, cpFloat width, cpFloat height)
+cpPolyShape *cpBoxShapeInit2(cpPolyShape *poly, cpBody *body, cpBB box)
+cpPolyShape *cpBoxShapeInit3(cpPolyShape *poly, cpBody *body, cpBB box, cpFloat radius)
+
+cpShape *cpBoxShapeNew(cpBody *body, cpFloat width, cpFloat height)
+cpShape *cpBoxShapeNew2(cpBody *body, cpBB box)
+cpShape *cpBoxShapeNew3(cpBody *body, cpBB box, cpFloat radius)
+```
+
+### 多边形辅助函数
+
+-  cpBool cpPolyValidate(const cpVect *verts, const int numVerts) - 检测定点数组是否能顺时针围成凸多边形。
+-  cpVect cpCentroidForPoly(const int numVerts, const cpVect *verts) - 计算多边形的几何中心。
+-  void cpRecenterPoly(const int numVerts, cpVect *verts) - 把一个多边形居中到(0,0)，用定点减去几何中心。
+
+### 凸包辅助函数
+
+```
+int cpConvexHull(int count, cpVect *verts, cpVect *result, int *first, cpFloat tol)
+```
+
+计算一个给定集合的凸包。返回凸包里点的数量。`result`必须是一个指向`cpVect`数组的指针，至少有`count`个元素。如果`result`是`NULL`，数组`verts`会被缩减。`first`是一个可选的整型指针用来存储凸包的起点（即`verts[first] == result[0]`）。`tol`是凸包允许被继续收缩的幅度。0.0公差表示一个精确的凸包。
+
+```
+#define CP_CONVEX_HULL(inputCount, inputVerts, outputCount_varName, outputVerts_varName)
+```
+
+`cpConvexHull()`的简化宏。在栈上用`alloca()`创建数组，然后调用`cpConvexHull()`。因为输出数组是在栈上创建的所以不需要释放。
+
+cpConvexHull例子
+
+```
+int first = 0;
+
+// 创建空间来存储凸包。
+// alloca()，或者可变长度的数组会更好，但是不要总考虑可移植性。
+cpVect *hullVerts = (cpVect *)calloc(vertCount, sizeof(cpVect));
+int hullCount = cpConvexHull(vertCount, verts, hullVerts, &first, 0.0);
+
+
+// 这里hullVerts[0]和verts[first]将会是相等的。
+// 如果你不关心`first`指针，可以传NULL。
+
+cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, hullCount, hullVerts, cpvzero));
+cpShape *shape = cpPolyShapeNew(body, hullCount, hullVerts, cpvzero);
+
+free(hullVerts);
+
+// *********
+// 另外你可以使用CP_CONVEX_HULL()宏来省点事
+
+// 这个宏会声明hullCount和hullVerts变量。
+// hullVerts是在栈上申请的空间，不需要释放。
+CP_CONVEX_HULL(count, verts, hullCount, hullVerts)
+
+cpBody *body = cpBodyNew(mass, cpMomentForPoly(mass, hullCount, hullVerts, cpvzero));
+cpShape *shape = cpPolyShapeNew(body, hullCount, hullVerts, cpvzero);
+
+```
+
 ## 6.9 修改cpShpaes
 
-简短的回答是，你不能因为这些更改将只拿起一个改变形状的面的位置，而不是它的速度。长的答案是，你可以使用“不安全”的API，只要你认识到这样做不会导致真实的物理行为。这些额外的功能都在单独的头文件`chipmunk_unsafe.h`中定义。
+简短的回答是你不能修改，因为这些更改都只会被提炼成形状表面的位置的变化，连速度都不会变。长一点儿的回答是，你可以使用“不安全”的API，但是你要知道现实生活中的物理实验是不会得到这样的结果的。这些额外的功能都在单独的头文件`chipmunk_unsafe.h`中定义。
 
 ## 6.10 札记
 
 -  你可以将多个碰撞形状关联到刚体上。这样你就可以创建几乎任何形状。 
--  关联在同一个刚体上的形状不会产生冲突。你不必担心同个刚体上的形状的重叠问题。 
--  确保刚体和刚体的碰撞形状都被添加进了空间。有个例外，就是当你如果有一个外部刚体或你嵌入自身到刚体。在这种情况下，只需把形状添加进空间。
+-  关联在同一个刚体上的形状不会产生碰撞。你不必担心同个刚体上的形状的重叠问题。 
+-  确保刚体和刚体的碰撞形状都被添加进了空间。除非你有一个外部刚体或者一个自己维护的刚体，这中情况下，只需把形状添加进空间。
 
 # 7. Chipmunk空间：cpSpace
 
