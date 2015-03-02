@@ -873,7 +873,7 @@ cpShape *shape = cpPolyShapeNew(body, hullCount, hullVerts, cpvzero);
 
 ```
 
-## 6.9 修改cpShpaes
+## 6.9 修改cpShapes
 
 简短的回答是你不能修改，因为这些更改都只会被提炼成形状表面的位置的变化，连速度都不会变。长一点儿的回答是，你可以使用“不安全”的API，但是你要知道现实生活中的物理实验是不会得到这样的结果的。这些额外的功能都在单独的头文件`chipmunk_unsafe.h`中定义。
 
